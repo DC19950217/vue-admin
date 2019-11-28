@@ -93,6 +93,7 @@ import {
 
 export default {
   name: "login",
+  // setup(props, context) {
   setup(props, { refs }) {
     // 表单校验函数
     // 验证用户名
@@ -153,11 +154,13 @@ export default {
     };
 
     // 声明数据
+    // 3.0新特性 这里面放置data数据，生命周期，自定义函数
+    // reactive定义单一对象
     const menuTab = reactive([
       { txt: "登录", current: true, type: "login" },
       { txt: "注册", current: false, type: "register" }
     ]);
-
+    // ref定义基本类型
     // 隐藏确认密码
     const model = ref("login");
     // 切换登录注册
@@ -178,6 +181,18 @@ export default {
       passwords: [{ validator: validatePasswords, trigger: "blur" }],
       code: [{ validator: validateCode, trigger: "blur" }]
     });
+    // isRef判断这个值是否是基础数据类型
+    // console.log(isRef(model)?true:false)
+    // toRefs将reactive对象转为普通对象，保证对象解构或拓展运算符不会丢失原有响应式对象的响应
+    /* function obj(){
+    const pos = reactive({
+      x:1,
+      y:2
+    })
+    return toRefs(pos)
+  }
+  const {x,y} = obj();
+  console.log(x.value) */
 
     /**
      * 声明函数
