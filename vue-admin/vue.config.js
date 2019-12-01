@@ -12,16 +12,16 @@ module.exports = {
     chainWebpack: (config) => {},
     configureWebpack: (config) => {
         config.resolve = { // 配置解析别名
-          extensions: ['.js', '.json', '.vue'],
-          alias: {
-            '@': path.resolve(__dirname, './src'),
-            'public': path.resolve(__dirname, './public'),
-            'components': path.resolve(__dirname, './src/components'),
-            'common': path.resolve(__dirname, './src/common'),
-            'api': path.resolve(__dirname, './src/api'),
-            'views': path.resolve(__dirname, './src/views'),
-            'data': path.resolve(__dirname, './src/data')
-          }
+            extensions: ['.js', '.json', '.vue'],
+            alias: {
+                '@': path.resolve(__dirname, './src'),
+                'public': path.resolve(__dirname, './public'),
+                'components': path.resolve(__dirname, './src/components'),
+                'common': path.resolve(__dirname, './src/common'),
+                'api': path.resolve(__dirname, './src/api'),
+                'views': path.resolve(__dirname, './src/views'),
+                'data': path.resolve(__dirname, './src/data')
+            }
         }
     },
     // 生产环境是否生成 sourceMap 文件
@@ -54,9 +54,17 @@ module.exports = {
         host: '0.0.0.0', // 指定使用地址，默认localhost,0.0.0.0代表可以被外界访问
         port: 8080, // 访问端口
         https: false, // 编译失败时刷新页面
-        hot: true, // 开启热加载
+        hot: true, // 开启热加载API
         hotOnly: false,
-        proxy: null, // 设置代理
+        proxy: { // 设置代理
+            '/devApi': {
+                target: "http://www.web-jshtml.cn/productapi",
+                changeOrigin: true,
+                pathRewrite: {
+                    '^/devApi': ''
+                }
+            }
+        },
         overlay: { // 全屏模式下是否显示脚本错误
             warnings: true,
             errors: true
