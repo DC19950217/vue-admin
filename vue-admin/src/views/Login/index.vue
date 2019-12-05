@@ -94,6 +94,7 @@
   </div>
 </template>
 <script>
+import sha1 from "js-sha1";
 import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
 import {
   stripscript,
@@ -101,7 +102,7 @@ import {
   validatePass,
   validateVCode
 } from "@/utils/validate";
-import { GetSms, Register } from "../../api/login";
+import { GetSms, Register, Login } from "../../api/login";
 
 export default {
   name: "login",
@@ -180,7 +181,7 @@ export default {
 
     // 表单绑定数据
     const ruleForm = reactive({
-      username: "",
+      username: "11111@163.com",
       password: "",
       passwords: "",
       code: ""
@@ -197,8 +198,6 @@ export default {
     /**
      * 声明函数*************************************************
      */
-    // 倒计时
-
     // 切换tab
     const toggleMenu = data => {
       menuTab.forEach(elem => {
@@ -208,12 +207,10 @@ export default {
       data.current = true;
       // 修改模块值
       model.value = data.type;
-      // 重置表单数据
-      refs["loginForm"].resetFields();
-      codeButtonStatus.text = "获取验证码";
-      // 禁用登录或者注册按钮
-      loginButtonStatus.value = true;
+      resetFormData();
+      clearCountDowmAndButton();
     };
+
     // 获取验证码
     const getSms = () => {
       if (ruleForm.username == "") {
@@ -228,10 +225,13 @@ export default {
         username: ruleForm.username,
         module: model.value
       };
-      // 禁用按钮
-      codeButtonStatus.status = true;
-      // 改变文字
-      codeButtonStatus.text = "发送中";
+      // 禁用获取验证码按钮和改变文字
+      /*  codeButtonStatus.status = true;
+      codeButtonStatus.text = "发送中"; */
+      codeButtonStatuss({
+        status: true,
+        text: "发送中"
+      });
       // 获取验证码
       GetSms(requestData)
         .then(response => {
@@ -247,8 +247,12 @@ export default {
         })
         .catch(error => {
           if (error.resCode != 0) {
-            codeButtonStatus.status = false;
-            codeButtonStatus.text = "获取验证码";
+            /*  codeButtonStatus.status = false;
+            codeButtonStatus.text = "获取验证码"; */
+            codeButtonStatuss({
+              status: false,
+              text: "获取验证码"
+            });
           }
         });
     };
@@ -257,21 +261,7 @@ export default {
     const submitForm = formName => {
       refs[formName].validate(valid => {
         if (valid) {
-          let resquestData = {
-            username: ruleForm.username,
-            password: ruleForm.password,
-            code: ruleForm.code,
-            module: "register"
-          };
-          Register(resquestData)
-            .then(response => {
-              let data = response.data;
-              root.$message({
-                message: data.message,
-                type: "success"
-              });
-            })
-            .catch(error => {});
+          model.value === "login" ? login() : register();
         } else {
           console.log("error submit!!");
           return false;
@@ -279,18 +269,91 @@ export default {
       });
     };
 
+    // 登录
+    const login = () => {
+      let resquestData = {
+        username: ruleForm.username,
+        password: sha1(ruleForm.password),
+        code: ruleForm.code
+      };
+      Login(resquestData)
+        .then(response => {
+          let data = response.data;
+          root.$message({
+            message: data.message,
+            type: "success"
+          });
+        })
+        .catch(error => {});
+    };
+    // 注册
+    const register = () => {
+      let resquestData = {
+        username: ruleForm.username,
+        password: sha1(ruleForm.password),
+        code: ruleForm.code,
+        module: "register"
+      };
+      Register(resquestData)
+        .then(response => {
+          let data = response.data;
+          root.$message({
+            message: data.message,
+            type: "success"
+          });
+          toggleMenu(menuTab[0]);
+          clearCountDowmAndButton();
+        })
+        .catch(error => {});
+    };
+
     // 倒计时
     const countDown = number => {
+      if (timer.value) {
+        clearCountDowm();
+      }
+
       let time = number;
       timer.value = setInterval(() => {
         if (time === 0) {
-          clearInterval(timer.value);
-          codeButtonStatus.status = false;
-          codeButtonStatus.text = "重新发送";
+          clearCountDowm();
+          /*  codeButtonStatus.status = false;
+          codeButtonStatus.text = "重新发送"; */
+          codeButtonStatuss({
+            status: false,
+            text: "重新发送"
+          });
         } else {
           codeButtonStatus.text = `倒计时${time--}秒`;
         }
       }, 1000);
+    };
+    // 清除倒计时和还原按钮的默认状态
+    const clearCountDowmAndButton = () => {
+      // 还原按钮的默认状态
+      /*  codeButtonStatus.status = false;
+      codeButtonStatus.text = "获取验证码"; */
+      codeButtonStatuss({
+        status: false,
+        text: "获取验证码"
+      });
+      clearCountDowm();
+    };
+    // 封装可复用状态函数
+    // 清除倒计时
+    const clearCountDowm = () => {
+      clearInterval(timer.value);
+    };
+    // 清除表单数据
+    const resetFormData = () => {
+      // 重置表单数据
+      refs["loginForm"].resetFields();
+    };
+    // 改变注册和登录按钮启用或者禁用状态
+    // 改变获取验证码按钮的状态或者文字
+    const codeButtonStatuss = params => {
+      codeButtonStatus.status = params.status;
+      codeButtonStatus.text = params.text;
     };
     /**
      * 生命周期
@@ -305,6 +368,7 @@ export default {
       codeButtonStatus,
       timer,
       toggleMenu,
+      clearCountDowmAndButton,
       countDown,
       submitForm,
       ruleForm,
