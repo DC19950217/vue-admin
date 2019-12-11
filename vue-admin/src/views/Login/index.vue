@@ -181,7 +181,7 @@ export default {
 
     // 表单绑定数据
     const ruleForm = reactive({
-      username: "11111@163.com",
+      username: "15218298951@163.com",
       password: "",
       passwords: "",
       code: ""
@@ -283,8 +283,14 @@ export default {
             message: data.message,
             type: "success"
           });
+          // 页面跳转
+          root.$route.push({
+            name: "Console"
+          });
         })
-        .catch(error => {});
+        .catch(error => {
+          console.log(error);
+        });
     };
     // 注册
     const register = () => {
@@ -312,9 +318,9 @@ export default {
       if (timer.value) {
         clearCountDowm();
       }
-
       let time = number;
       timer.value = setInterval(() => {
+        time--;
         if (time === 0) {
           clearCountDowm();
           /*  codeButtonStatus.status = false;
@@ -324,7 +330,7 @@ export default {
             text: "重新发送"
           });
         } else {
-          codeButtonStatus.text = `倒计时${time--}秒`;
+          codeButtonStatus.text = `倒计时${time}秒`;
         }
       }, 1000);
     };

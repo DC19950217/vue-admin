@@ -14,10 +14,6 @@ const server = axios.create({
 server.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
     console.log(config.headers)
-    config.headers['Tokey'] = '111111111111111';
-
-
-
     return config;
 
 }, function (error) {

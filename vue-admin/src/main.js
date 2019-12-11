@@ -1,8 +1,12 @@
 import Vue from "vue";
 import App from "./App.vue";
-
+// elementui
 import './plugins/element.js';
+// 转vue3.0
 import './plugins/composition-api';
+
+// 引入全家组件
+import './icons/index.js';
 
 import router from "./router";
 import store from "./store";

@@ -55,18 +55,37 @@
         }) */
         // all
         // 数组内有promise必须全部成功（全部返回resolve），才会执行then回调，只要一个是返回（reject）不成功就会执行catch
-      /*   Promise.all([promise1(true), promise2(true)]).then(response => {
-            console.log("全部执行成功")
-        }).catch(error => {
-            console.log("有些可能失败")
-        }) */
+        /*   Promise.all([promise1(true), promise2(true)]).then(response => {
+              console.log("全部执行成功")
+          }).catch(error => {
+              console.log("有些可能失败")
+          }) */
         // rece数组，当执行的时候，遇到的返回结果是resolve，一直执行链式
         // rece只要有一个返回resolve，就代表成功，就会回调then。但是，如果第一个是返回reject那么就失败
-        Promise.all([promise1(true), promise2(true)]).then(response => {
-            console.log("全部执行成功")
-        }).catch(error => {
-            console.log("有些可能失败")
-        })
+        /*   Promise.all([promise1(true), promise2(true)]).then(response => {
+              console.log("全部执行成功")
+          }).catch(error => {
+              console.log("有些可能失败")
+          }) */
+        var i = 20;
+
+        function fn() {
+            i -= 2;
+            var i = 10;
+            console.log("不是return的i："+i);
+            return function (n) {
+                console.log((++i) - n);
+              
+            }
+        }
+        var f = fn();
+        f(1);//19(没加了i=10) //11(加了i=10)
+        f(2);//20(没加了i=10) //12(加了i=10)
+        // console.log(i)
+        fn()(3);//19(没加了i=10)
+        fn()(4);//18(没加了i=10)
+        f(5);//19
+        f = null;
     </script>
 </body>
 
