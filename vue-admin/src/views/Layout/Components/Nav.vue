@@ -1,5 +1,11 @@
 <template>
   <div id="nav-wrap">
+    <h1 class="logo">
+      <img
+        src="https://cn.vuejs.org/images/icons/android-icon-144x144.png"
+        alt=""
+      />
+    </h1>
     <el-menu
       default-active="1-4-1"
       class="el-menu-vertical-demo"
@@ -16,6 +22,7 @@
           <!-- 一级菜单 -->
           <template slot="title">
             <!-- <i :class="item.meta.icon"></i> -->
+            <!-- icon图标 -->
             <svg-icon :iconClass="item.meta.icon" :className="item.meta.icon" />
             <span slot="title">{{ item.meta.name }}</span>
           </template>
@@ -59,6 +66,13 @@ export default {
 </script>
 <style lang="scss" scoped>
 @import "../../../styles/config.scss";
+.logo{
+  text-align: center;
+  img{
+    margin: 28px auto 25px;
+    width: 92px;
+  }
+}
 #nav-wrap {
   position: fixed;
   top: 0;
@@ -66,7 +80,7 @@ export default {
   width: $navMenu;
   height: 100vh;
   background-color: #344a5f;
-  svg{
+  svg {
     font-size: 20px;
     margin-right: 10px;
   }
