@@ -26,19 +26,30 @@ export default {
 .main-content {
   width: 100%;
   height: 100%;
-  padding: $layoutHeader + 30 30px 0 $navMenu + 30;
-  // padding-top: ;
-  // padding-left: ;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  // padding: $layoutHeader + 30 30px 0 $navMenu + 30;
+  padding-top: $layoutHeader + 30;
+  padding-right: 30px;
+  // -webkit-box-sizing: border-box;
+  // box-sizing: border-box;
   background-color: #f7f7f7;
+  @include webkit(box-sizing, border-box);
+  @include webkit(transition, all 0.3s ease 0s);
+}
+.open {
+  .main-content {
+    padding-left: $navMenu + 30;
+  }
+}
+.close {
+  .main-content {
+    padding-left: $navMenuMin + 30;
+  }
 }
 .content {
   width: 100%;
   height: 100%;
   padding: 30px 30px 0 30px;
-  -webkit-box-sizing: border-box;
-  box-sizing: border-box;
+  @include webkit(box-sizing, border-box);
   background-color: #fff;
 }
 </style>
