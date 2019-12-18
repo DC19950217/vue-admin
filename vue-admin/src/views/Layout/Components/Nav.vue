@@ -67,6 +67,7 @@ export default {
   img {
     margin: 28px auto 25px;
     width: 92px;
+    @include webkit(transition,all .3s ease 0s);
   }
 }
 #nav-wrap {
@@ -89,6 +90,9 @@ export default {
 .close {
   #nav-wrap {
     width: $navMenuMin;
+  }
+  .logo img{
+      width: 70%;
   }
 }
 </style>
