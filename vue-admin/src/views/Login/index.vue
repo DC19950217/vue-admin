@@ -182,7 +182,7 @@ export default {
     // 表单绑定数据
     const ruleForm = reactive({
       username: "15218298951@163.com",
-      password: "",
+      password: "chang19950217?",
       passwords: "",
       code: ""
     });
@@ -276,6 +276,7 @@ export default {
         password: sha1(ruleForm.password),
         code: ruleForm.code
       };
+      // root.$store.dispatch("login",resquestData);
       Login(resquestData)
         .then(response => {
           let data = response.data;

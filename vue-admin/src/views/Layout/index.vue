@@ -23,9 +23,9 @@ export default {
     LayoutHeader,
     LayoutNav,
     LayoutMain
-  },
+  },                                                                           
   setup(props, { root }) {
-    const menuStatus = computed(() => root.$store.state.isCollapse);
+    const menuStatus = computed(() => root.$store.state.app.isCollapse);
     return {
       menuStatus
     };

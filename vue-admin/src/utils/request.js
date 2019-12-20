@@ -7,7 +7,7 @@ import {
 const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi';
 const server = axios.create({
     baseURL: BASEURL, //http://192.168.3.2:8080/devApi/ ==>http://www.web-jshtml.cn/productapi
-    timeout: 5000
+    timeout: 10000
 
 });
 //请求接口前，做一些数据处理 （请求拦截器）

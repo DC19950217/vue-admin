@@ -1,13 +1,23 @@
 import Vue from "vue";
 import Vuex from "vuex";
+Vue.use(Vuex);
 
-import state from "./state";
+import app from "./modules/app";
+import login from "./modules/login";
+
+
+export default new Vuex.Store({
+  modules:{
+    app,
+    login
+  }
+});
+
+
+/* import state from "./state";
 import mutations from "./mutations";
 import actions from "./actions";
-import getters from "./getters";
-
-
-Vue.use(Vuex);
+import getters from "./getters"; */
 
 /* export default new Vuex.Store({
   state: {
@@ -21,9 +31,9 @@ Vue.use(Vuex);
   getters: {},
   actions: {}
 }); */
-export default new Vuex.Store({
+/* export default new Vuex.Store({
   state,
   mutations,
   getters,
   actions
-});
+}); */

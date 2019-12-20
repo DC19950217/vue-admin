@@ -51,7 +51,7 @@ export default {
     // 路由的路径
     const routers = reactive(root.$router.options.routes);
     // 菜单收起和打开
-    const isCollapse = computed(() => root.$store.state.isCollapse);
+    const isCollapse = computed(() => root.$store.state.app.isCollapse);
 
     return {
       isCollapse,

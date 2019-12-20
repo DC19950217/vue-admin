@@ -1,5 +1,5 @@
 /**
  * mutation的名称常量
  */
-export const TEST = 'test';
 export const SET_COLLAPSE = 'set_collapse';
+export const SET_LOGIN = 'set_login';
