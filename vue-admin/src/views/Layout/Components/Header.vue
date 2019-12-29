@@ -6,23 +6,32 @@
     <div class="pull-right">
       <div class="user-info pull-left">
         <img src="https://cn.vuejs.org/images/icons/favicon-32x32.png" alt="" />
-        管理员
+        {{username}}
       </div>
-      <div class="header-icon pull-left">
+      <div class="header-icon pull-left" @click="exit">
         <svg-icon iconClass="exit" className="exit" />
       </div>
     </div>
   </div>
 </template>
 <script>
+import {computed} from "@vue/composition-api"
+import {removeToken} from "@/utils/app"
 export default {
   name: "Header",
   setup(props, { root }) {
+    const username = computed(() => root.$store.state.app.username);
     const navMenuState = () => {
       root.$store.commit("app/SET_COLLAPSE");
     };
+    const exit = ()=>{
+      removeToken();
+      root.$router.push('/login');
+    }
     return {
-      navMenuState
+      navMenuState,
+      exit,
+      username
     };
   }
 };

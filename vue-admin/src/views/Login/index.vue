@@ -276,8 +276,21 @@ export default {
         password: sha1(ruleForm.password),
         code: ruleForm.code
       };
-      // root.$store.dispatch("login",resquestData);
-      Login(resquestData)
+      root.$store.dispatch("app/login",resquestData).then(data=>{
+          console.log(data);
+        if(data.resCode===0){
+          root.$message({
+            message: data.message,
+            type: "success"
+          });
+          root.$router.push({
+            name: "Console"
+          });
+        }
+      }).catch(err=>{
+        console.log(err);
+      })
+      /* Login(resquestData)
         .then(response => {
           let data = response.data;
           root.$message({
@@ -291,7 +304,7 @@ export default {
         })
         .catch(error => {
           console.log(error);
-        });
+        }); */
     };
     // 注册
     const register = () => {
