@@ -6,7 +6,7 @@
     <div class="pull-right">
       <div class="user-info pull-left">
         <img src="https://cn.vuejs.org/images/icons/favicon-32x32.png" alt="" />
-        {{username}}
+        {{ username }}
       </div>
       <div class="header-icon pull-left" @click="exit">
         <svg-icon iconClass="exit" className="exit" />
@@ -15,8 +15,7 @@
   </div>
 </template>
 <script>
-import {computed} from "@vue/composition-api"
-import {removeToken} from "@/utils/app"
+import { computed } from "@vue/composition-api";
 export default {
   name: "Header",
   setup(props, { root }) {
@@ -24,10 +23,37 @@ export default {
     const navMenuState = () => {
       root.$store.commit("app/SET_COLLAPSE");
     };
-    const exit = ()=>{
-      removeToken();
-      root.$router.push('/login');
-    }
+    const exit = () => {
+      /* root.$store.dispatch("app/exit").then(data=>{
+         root.$message({
+            message:data ,
+            type: "success"
+          });
+        root.$router.push({
+          name:"Login"
+        });
+      }).catch(error=>console.log(error)) */
+      root.$confirm("此操作将退出登录, 是否继续?", "提示", {
+          confirmButtonText: "确定",
+          cancelButtonText: "取消",
+          type: "warning"
+        }).then(() => {
+          root.$store.dispatch("app/exit").then(data => {
+              root.$message({
+                message: data,
+                type: "success"
+              });
+              root.$router.push({
+                name: "Login"
+              });
+            }).catch(error => console.log(error));
+        }).catch(() => {
+          root.$message({
+            message: "已取消退出登录",
+            type: "info"
+          });
+        });
+    };
     return {
       navMenuState,
       exit,

@@ -24,6 +24,8 @@
 
 查看分支（包含远程分支）：git branch -a
 
+合并分支：git merge --on-ff '描述' <name>
+
 master：主分支，一般不会在此分支上开发项目
 
 dev：开发分支，一般会在此分支上开发

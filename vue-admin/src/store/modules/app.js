@@ -3,12 +3,15 @@ import {
 } from "@/api/login";
 import {
     setToken,
+    getToken,
     setUserName,
-    getUserName
+    getUserName,
+    removeToken,
+    removeUserName
 } from "@/utils/app"
 const state = {
     isCollapse: JSON.parse(sessionStorage.getItem('isCollapse')) || false,
-    to_ken: '',
+    to_ken: getToken()||'',
     username: getUserName()||''
 }
 const getters = {
@@ -17,7 +20,6 @@ const getters = {
 const mutations = {
     // 处理nav菜单的收起展开
     SET_COLLAPSE(state) {
-        console.log(state.isCollapse);
         state.isCollapse = !state.isCollapse;
         // html5本地储存
         sessionStorage.setItem('isCollapse', JSON.stringify(state.isCollapse));
@@ -41,6 +43,13 @@ const actions = {
         setUserName(resdata.data.data.username);
         return resdata.data;
 
+    },
+    async exit({commit}){
+        removeToken();
+        removeUserName();
+        commit("SET_TOKEN","");
+        commit("SET_USERNAME","");
+        return "退出成功";
     }
 }
 
