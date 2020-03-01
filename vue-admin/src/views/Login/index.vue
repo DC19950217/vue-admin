@@ -378,7 +378,7 @@ export default {
     /**
      * 生命周期
      */
-    // 挂在完成后
+    // 挂载完成后
     onMounted(() => {});
 
     return {

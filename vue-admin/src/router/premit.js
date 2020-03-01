@@ -17,7 +17,6 @@ router.beforeEach((to, from, next) => {
        }else{
         next();
        }
-       
         console.log("存在");
     } else {
         if (whiteRouter.indexOf(to.path) !== -1) {
