@@ -38,3 +38,17 @@
 .el-input__inner {
     border: 1px solid #DCDFE6 !important;
 }
+
+// table样式
+div.el-table{
+    td,th{
+        text-align: center;
+    }
+    th{
+        font-weight: bold;
+        color: #344a5f;
+    }
+    td{
+        font-size: 14px;
+    }
+}
