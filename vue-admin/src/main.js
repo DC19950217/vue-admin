@@ -5,7 +5,7 @@ import "./plugins/element.js";
 // 转vue3.0
 import "./plugins/composition-api";
 
-// 引入全家组件
+// 自定义全局组件
 import "./icons/index.js";
 // 引入路由守卫
 import "./router/premit";

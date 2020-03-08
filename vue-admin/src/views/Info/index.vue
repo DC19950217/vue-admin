@@ -5,7 +5,11 @@
         <div class="label-wrap category">
           <label for="">类型：</label>
           <div class="warp-content">
-            <el-select v-model="value" placeholder="请选择" style="width:100%;">
+            <el-select
+              v-model="category_value"
+              placeholder="请选择"
+              style="width:100%;"
+            >
               <el-option
                 v-for="item in options"
                 :key="item.value"
@@ -22,7 +26,7 @@
           <label for="">日期：&nbsp;&nbsp;</label>
           <div class="warp-content">
             <el-date-picker
-              v-model="value2"
+              v-model="date_value"
               type="datetimerange"
               align="right"
               start-placeholder="开始日期"
@@ -58,15 +62,23 @@
         ></el-input>
       </el-col>
       <el-col :span="2">
-        <el-button type="danger" size="medium" style="width:100%;">搜索</el-button>
+        <el-button type="danger" size="medium" style="width:100%;"
+          >搜索</el-button
+        >
       </el-col>
       <el-col :span="2" :push="2">
-        <el-button type="danger" size="medium" style="width:100%;">新增</el-button>
+        <el-button
+          type="danger"
+          size="medium"
+          @click="dialog_info = true"
+          style="width:100%;"
+          >新增</el-button
+        >
       </el-col>
     </el-row>
     <div class="black-space-30"></div>
     <!-- 表格数据 -->
-    <el-table :data="tableData" border style="width:100%">
+    <el-table :data="table_data" border style="width:100%">
       <el-table-column type="selection" width="45"> </el-table-column>
       <el-table-column prop="title" label="标题" width="400"></el-table-column>
       <el-table-column
@@ -78,8 +90,12 @@
       <el-table-column prop="user" label="管理员" width="100"></el-table-column>
       <el-table-column label="操作">
         <template>
-          <el-button type="danger" size="mini">删除</el-button>
-          <el-button type="success" size="mini">编辑</el-button>
+          <el-button type="danger" size="mini">
+            删除
+          </el-button>
+          <el-button type="success" size="mini" @click="dialog_info = true"
+            >编辑</el-button
+          >
         </template>
       </el-table-column>
     </el-table>
@@ -101,12 +117,22 @@
         </el-pagination>
       </el-col>
     </el-row>
+
+    <!-- 新增的弹窗 -->
+    <!-- 需要逻辑运算的时候就要用第一种 -->
+    <!-- <DialogInfo :flag="dialog_info" @close="closeDialog" /> -->
+    <!-- 不需要逻辑运算用这种有修饰器的 -->
+    <DialogInfo :flag.sync="dialog_info" />
   </div>
 </template>
 <script>
+import DialogInfo from "./dialog/info";
 import { reactive, ref } from "@vue/composition-api";
 export default {
   name: "InfoIndex",
+  components: {
+    DialogInfo
+  },
   setup(props) {
     const options = reactive([
       {
@@ -134,7 +160,7 @@ export default {
       }
     ]);
     // 表格数据
-    const tableData = reactive([
+    const table_data = reactive([
       {
         title: "白衣长城 绝不后退！ 一线党旗红 理上网来",
         category: "国内新闻",
@@ -160,10 +186,14 @@ export default {
         user: "dengchang"
       }
     ]);
-    const value = ref("");
+    // 信息弹窗标记
+    const dialog_info = ref(false);
+    // 你要选择的那个的信息分类
+    const category_value = ref("");
     const search_key = ref("id");
-    const value2 = ref("");
+    const date_value = ref("");
     const search_keyWork = ref("");
+    // vue2.0 methods
     // 需要显示多少条数据
     const handleSizeChange = val => {
       console.log(1111);
@@ -174,13 +204,17 @@ export default {
     };
 
     return {
+      // reactive
       options,
       search_option,
+      table_data,
+      // ref
+      dialog_info,
+      category_value,
       search_key,
-      value,
-      value2,
+      date_value,
       search_keyWork,
-      tableData,
+      // methods
       handleSizeChange,
       handleCurrentChange
     };
