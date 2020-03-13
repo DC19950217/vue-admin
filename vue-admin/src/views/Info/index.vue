@@ -90,7 +90,7 @@
       <el-table-column prop="user" label="管理员" width="100"></el-table-column>
       <el-table-column label="操作">
         <template>
-          <el-button type="danger" size="mini">
+          <el-button type="danger" size="mini" @click="deleteItem">
             删除
           </el-button>
           <el-button type="success" size="mini" @click="dialog_info = true"
@@ -103,7 +103,7 @@
     <!-- 底部分页 -->
     <el-row>
       <el-col :span="9">
-        <el-button size="medium">批量删除</el-button>
+        <el-button size="medium" @click="deleteAll">批量删除</el-button>
       </el-col>
       <el-col :span="15">
         <el-pagination
@@ -127,13 +127,15 @@
 </template>
 <script>
 import DialogInfo from "./dialog/info";
+import { global } from "@/utils/global_V3.0.js";
 import { reactive, ref } from "@vue/composition-api";
 export default {
   name: "InfoIndex",
   components: {
     DialogInfo
   },
-  setup(props) {
+  setup(props, { root }) {
+    const { confirm } = global();
     const options = reactive([
       {
         value: 1,
@@ -202,6 +204,38 @@ export default {
     const handleCurrentChange = val => {
       console.log(2222);
     };
+    // 是否删除信息确认弹窗
+    const deleteItem = () => {
+      confirm({
+        content: "确定删除当前信息，确认后将无法恢复！！",
+        tip: "警告",
+        fn: confirmDelete,
+        id: 1111111
+      });
+      /* root.confirm({
+        content: "确定删除当前信息，确认后将无法恢复！！",
+        tip: "警告",
+        fn: confirmDelete,
+        id: 1111111
+      }); */
+    };
+
+    const deleteAll = () => {
+      confirm({
+        content: "确定删除选择的数据，确认后将无法恢复！！",
+        fn: confirmDelete,
+        id: 2222222
+      });
+      /* root.confirm({
+        content: "确定删除选择的数据，确认后将无法恢复！！",
+        fn: confirmDelete,
+        id: 2222222
+      }); */
+    };
+
+    const confirmDelete = value => {
+      console.log(value);
+    };
 
     return {
       // reactive
@@ -216,7 +250,9 @@ export default {
       search_keyWork,
       // methods
       handleSizeChange,
-      handleCurrentChange
+      handleCurrentChange,
+      deleteItem,
+      deleteAll
     };
   }
 };
