@@ -2,6 +2,12 @@ import axios from "axios";
 import {
     Message
 } from "element-ui"
+
+import {
+    getToken,
+    getUserName
+} from '@/utils/app'
+
 // 创建axios ，赋值变量server
 // 测试地址 http://www.web-jshtml.cn/productapi
 const BASEURL = process.env.NODE_ENV === 'production' ? '' : '/devApi';
@@ -13,7 +19,8 @@ const server = axios.create({
 //请求接口前，做一些数据处理 （请求拦截器）
 server.interceptors.request.use(function (config) {
     // 在发送请求之前做些什么
-    // console.log(config.headers)
+    config.headers['Tokey'] = getToken();
+    config.headers['UserName'] = getUserName();
     return config;
 
 }, function (error) {
