@@ -26,6 +26,12 @@
 
 合并分支：git merge --on-ff -m '描述' <name>
 
+删除远程分支：git push origin --delete <name>
+
+删除本地分支：git branch -d <name>
+
+把创建好的本地分支提交到远程去（切记要先切换到你要提交的这个分支上再提交）：git push --set-upstream origin <name>
+
 master：主分支，一般不会在此分支上开发项目
 
 dev：开发分支，一般会在此分支上开发
