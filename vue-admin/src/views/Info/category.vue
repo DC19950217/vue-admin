@@ -19,7 +19,12 @@
                   <el-button size="mini" type="success" round
                     >添加子级</el-button
                   >
-                  <el-button size="mini" round>删除</el-button>
+                  <el-button
+                    size="mini"
+                    round
+                    @click="deleteCategoryComfirm(firstItem.id)"
+                    >删除</el-button
+                  >
                 </div>
               </h4>
               <ul v-if="firstItem.children">
@@ -41,16 +46,23 @@
           <h4 class="menu-title">一级分类名称</h4>
           <el-form label-width="142px" class="form-wrap" ref="categoryForm">
             <el-form-item label="一级分类名称:" v-if="category_first_input">
-              <el-input v-model="form.categoryName"></el-input>
+              <el-input
+                v-model="form.categoryName"
+                :disabled="category_first_disabled"
+              ></el-input>
             </el-form-item>
             <el-form-item label="二级分类名称:" v-if="category_children_input">
-              <el-input v-model="form.secCategoryName"></el-input>
+              <el-input
+                v-model="form.secCategoryName"
+                :disabled="category_children_disabled"
+              ></el-input>
             </el-form-item>
             <el-form-item>
               <el-button
                 type="danger"
                 @click="submit"
                 :loading="submit_button_loading"
+                :disabled="submit_button_disabled"
                 >确定</el-button
               >
             </el-form-item>
@@ -61,15 +73,21 @@
   </div>
 </template>
 <script>
-import { AddFirstCategory, GetCategory } from "@/api/news";
+import { AddFirstCategory, GetCategory, DeleteCategory } from "@/api/news";
 import { reactive, ref, onMounted } from "@vue/composition-api";
+import { global } from "@/utils/global_V3.0.js";
 export default {
   name: "category",
   setup(props, { root, refs }) {
+    const { confirm } = global();
     // ref
     const category_first_input = ref(true);
     const category_children_input = ref(true);
     const submit_button_loading = ref(false);
+    const category_first_disabled = ref(true);
+    const category_children_disabled = ref(true);
+    const submit_button_disabled = ref(true);
+    const deleteId = ref("");
     // reactive
     const form = reactive({
       categoryName: "",
@@ -118,6 +136,8 @@ export default {
     const addFirst = () => {
       category_first_input.value = true;
       category_children_input.value = false;
+      category_first_disabled.value = false;
+      submit_button_disabled.value = false;
     };
     // 获取一级分类资源
     const getCategory = () => {
@@ -125,6 +145,48 @@ export default {
         .then(response => {
           let data = response.data.data.data;
           category.item = data;
+        })
+        .catch(error => {
+          console.log(error);
+        });
+    };
+    // 删除一级分类
+    const deleteCategoryComfirm = categoryId => {
+      deleteId.value = categoryId;
+      confirm({
+        content: "确定删除当前分类，确认后将无法恢复！！",
+        tip: "警告",
+        fn: deleteCategory,
+        catchFn: () => {
+          deleteId.value = "";
+        }
+      });
+    };
+    // 删除分类封装函数
+    const deleteCategory = () => {
+      DeleteCategory({ categoryId: deleteId.value })
+        .then(response => {
+          let data = response.data;
+          console.log(data);
+          if (data.resCode === 0) {
+            // 第一种更新页面方法
+            // 使用es6的findIndex找到这个id所在数组的下标
+            /*  let index = category.item.findIndex(
+              item => item.id == deleteId.value
+            );
+            // 删除数组指定元素
+            category.item.splice(index, 1); */
+            // 第二种更新页面方法
+            // 使用es6的filter方法直接对比看数组里面的id和删除之后的有什么不同，如果对比的id不等于数组里面任意id就返回一个新的数组数据更新渲染到页面
+            let newData = category.item.filter(
+              item => item.id != deleteId.value
+            );
+            category.item = newData;
+            root.$message({
+              type: "success",
+              message: data.message
+            });
+          }
         })
         .catch(error => {
           console.log(error);
@@ -150,12 +212,16 @@ export default {
       category_first_input,
       category_children_input,
       submit_button_loading,
+      category_first_disabled,
+      category_children_disabled,
+      submit_button_disabled,
       // reactive
       form,
       category,
       // methods
       submit,
-      addFirst
+      addFirst,
+      deleteCategoryComfirm
     };
   }
 };
