@@ -15,13 +15,11 @@ export function global() {
                 center: true
             })
             .then(() => {
-                params.fn && params.fn(params.id);
+                str.value = params.id || '';
+                params.fn && params.fn(params.id || '');
             })
             .catch(() => {
-                /*   Message({
-                      type: "info",
-                      message: "已取消删除"
-                  }); */
+                params.catchFn && params.catchFn();
             });
     }
 
