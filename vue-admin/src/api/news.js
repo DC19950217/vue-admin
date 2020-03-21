@@ -23,3 +23,12 @@ export function GetCategory(data) {
         data
     })
 }
+
+// 删除分类
+export function DeleteCategory(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/deleteCategory/',
+        data
+    })
+}
