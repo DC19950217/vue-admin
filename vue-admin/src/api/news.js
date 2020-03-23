@@ -32,3 +32,12 @@ export function DeleteCategory(data) {
         data
     })
 }
+
+// 修改分类
+export function EditCategory(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/editCategory/',
+        data
+    })
+}
