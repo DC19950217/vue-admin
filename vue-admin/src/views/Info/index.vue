@@ -3,7 +3,7 @@
     <el-row :gutter="16">
       <el-col :span="4">
         <div class="label-wrap category">
-          <label for="">类型：</label>
+          <label for="">分类：</label>
           <div class="warp-content">
             <el-select
               v-model="category_value"
@@ -11,10 +11,10 @@
               style="width:100%;"
             >
               <el-option
-                v-for="item in options"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
+                v-for="item in options.category"
+                :key="item.id"
+                :label="item.category_name"
+                :value="item.id"
               >
               </el-option>
             </el-select>
@@ -128,28 +128,20 @@
 <script>
 import DialogInfo from "./dialog/info";
 import { global } from "@/utils/global_V3.0.js";
-import { reactive, ref } from "@vue/composition-api";
+import { GetCategory } from "@/api/news";
+import { common } from "@/api/common";
+import { reactive, ref, onMounted, watch } from "@vue/composition-api";
 export default {
   name: "InfoIndex",
   components: {
     DialogInfo
   },
   setup(props, { root }) {
+    const { getInfoCategory, categoryItem } = common();
     const { confirm } = global();
-    const options = reactive([
-      {
-        value: 1,
-        label: "国际信息"
-      },
-      {
-        value: 2,
-        label: "国内信息"
-      },
-      {
-        value: 3,
-        label: "行业信息"
-      }
-    ]);
+    const options = reactive({
+      category: []
+    });
     //搜索关键字
     const search_option = reactive([
       {
@@ -236,6 +228,15 @@ export default {
     const confirmDelete = value => {
       console.log(value);
     };
+    // 生命周期
+    // 挂载完成时执行，（页面DOM元素完成时，实际完成）
+    onMounted(() => {
+      getInfoCategory();
+    });
+    // 监听数据变化
+    watch(()=>categoryItem.item,(value)=>{
+      options.category = value;
+    })
 
     return {
       // reactive

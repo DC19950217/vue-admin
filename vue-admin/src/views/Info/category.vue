@@ -94,11 +94,13 @@ import {
   DeleteCategory,
   EditCategory
 } from "@/api/news";
-import { reactive, ref, onMounted } from "@vue/composition-api";
+import { reactive, ref, onMounted, watch } from "@vue/composition-api";
 import { global } from "@/utils/global_V3.0.js";
+import { common } from "@/api/common";
 export default {
   name: "category",
   setup(props, { root, refs }) {
+    const { getInfoCategory, categoryItem } = common();
     const { confirm } = global();
     // ref
     const category_first_input = ref(true);
@@ -173,8 +175,8 @@ export default {
       submit_button_disabled.value = false;
       resetFields(false);
     };
-    // 获取一级分类资源
-    const getCategory = () => {
+    // 获取一级分类资源(被优化)
+   /*  const getCategory = () => {
       GetCategory({})
         .then(response => {
           let data = response.data.data.data;
@@ -183,7 +185,7 @@ export default {
         .catch(error => {
           console.log(error);
         });
-    };
+    }; */
     // 删除一级分类
     const deleteCategoryComfirm = categoryId => {
       deleteId.value = categoryId;
@@ -286,8 +288,17 @@ export default {
     // 生命周期
     // 挂载完成时执行，（页面DOM元素完成时，实际完成）
     onMounted(() => {
-      getCategory();
+      // getCategory();
+      // 获取一级分类数据(优化)
+      getInfoCategory();
     });
+    // 监听获取一级分类数据的变化
+    watch(
+      () => categoryItem.item,
+      value => {
+        category.item = value;
+      }
+    );
     return {
       // ref
       category_first_input,
