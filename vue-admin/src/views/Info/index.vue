@@ -231,12 +231,17 @@ export default {
     // 生命周期
     // 挂载完成时执行，（页面DOM元素完成时，实际完成）
     onMounted(() => {
-      getInfoCategory();
+      // vue3.0
+      // getInfoCategory();
+      // vuex
+      root.$store.dispatch('common/getInfoCategory').then(res=>{
+        options.category = res;
+      })
     });
     // 监听数据变化
-    watch(()=>categoryItem.item,(value)=>{
+   /*  watch(()=>categoryItem.item,(value)=>{
       options.category = value;
-    })
+    }) */
 
     return {
       // reactive

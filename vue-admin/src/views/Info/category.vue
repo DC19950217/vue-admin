@@ -289,16 +289,20 @@ export default {
     // 挂载完成时执行，（页面DOM元素完成时，实际完成）
     onMounted(() => {
       // getCategory();
-      // 获取一级分类数据(优化)
-      getInfoCategory();
+      // 获取一级分类数据(vue3.0优化)
+      // getInfoCategory();
+      // vuex
+      root.$store.dispatch('common/getInfoCategory').then(res=>{
+        category.item = res;
+      })
     });
     // 监听获取一级分类数据的变化
-    watch(
+   /*  watch(
       () => categoryItem.item,
       value => {
         category.item = value;
       }
-    );
+    ); */
     return {
       // ref
       category_first_input,
