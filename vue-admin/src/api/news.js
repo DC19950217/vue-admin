@@ -41,3 +41,21 @@ export function EditCategory(data) {
         data
     })
 }
+
+//添加信息接口
+export function AddInfo(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/add/',
+        data
+    })
+}
+
+//信息列表
+export function GetList(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/getList/',
+        data
+    })
+}
