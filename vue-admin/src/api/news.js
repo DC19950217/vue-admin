@@ -59,3 +59,11 @@ export function GetList(data) {
         data
     })
 }
+// 删除信息
+export function DeleteInfo(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/deleteInfo/',
+        data
+    })
+}
