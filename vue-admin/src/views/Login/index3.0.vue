@@ -1,0 +1,286 @@
+<template>
+  <div id="login">
+    <div class="login-wrap">
+      <ul class="menu-tab">
+        <li
+          @click="toggleMenu(item)"
+          :class="{ current: item.current }"
+          v-for="(item, index) in menuTab"
+          :key="index"
+        >
+          {{ item.txt }}
+        </li>
+      </ul>
+      <!-- 表单 start -->
+      <el-form
+        :model="ruleForm"
+        status-icon
+        :rules="rules"
+        ref="ruleForm"
+        class="login-form"
+        size="medium"
+      >
+        <el-form-item prop="username" class="item-form">
+          <label>邮箱</label>
+          <el-input
+            type="text"
+            v-model="ruleForm.username"
+            autocomplete="off"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="password" class="item-form">
+          <label>密码</label>
+          <el-input
+            type="text"
+            v-model="ruleForm.password"
+            autocomplete="off"
+            minlength="6"
+            maxlength="20"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item
+          prop="passwords"
+          class="item-form"
+          v-show="model === 'register'"
+        >
+          <label>确认密码</label>
+          <el-input
+            type="text"
+            v-model="ruleForm.passwords"
+            autocomplete="off"
+            minlength="6"
+            maxlength="20"
+          ></el-input>
+        </el-form-item>
+
+        <el-form-item prop="code" class="item-form">
+          <label>验证码</label>
+          <el-row :gutter="10">
+            <el-col :span="15">
+              <el-input
+                v-model.number="ruleForm.code"
+                minlength="6"
+                maxlength="6"
+              ></el-input
+            ></el-col>
+            <el-col :span="9">
+              <el-button type="success" class="block">获取验证码</el-button>
+            </el-col>
+          </el-row>
+        </el-form-item>
+        <el-form-item>
+          <el-button
+            type="danger"
+            class="block login-btn"
+            @click="submitForm('ruleForm')"
+            >{{ sign }}</el-button
+          >
+        </el-form-item>
+      </el-form>
+    </div>
+  </div>
+</template>
+<script>
+import { reactive, ref, isRef, toRefs, onMounted } from "@vue/composition-api";
+import {
+  stripscript,
+  validateEmail,
+  validatePass,
+  validateVCode
+} from "@/utils/validate";
+
+export default {
+  name: "login",
+  // setup(props, context) {
+  setup(props, { refs }) {
+    // 表单校验函数
+    // 验证用户名
+    let validateUsername = (rule, value, callback) => {
+      if (value === "") {
+        callback(new Error("请输入用户名！"));
+      } else if (validateEmail(value)) {
+        callback(new Error("用户名格式有误！"));
+      } else {
+        callback();
+      }
+    };
+
+    // 验证密码
+    let validatePassword = (rule, value, callback) => {
+      // 过滤后的数据
+      ruleForm.password = stripscript(value);
+      value = ruleForm.password;
+      if (value === "") {
+        callback(new Error("请输入密码"));
+      } else if (validatePass(value)) {
+        callback(new Error("密码为6至20位数字+字母"));
+      } else {
+        callback();
+      }
+    };
+
+    // 验证确认密码
+    let validatePasswords = (rule, value, callback) => {
+      // 如果模块值为login就直接验证通过
+      if (model.value === "login") {
+        callback();
+      }
+      // 过滤后的数据
+      ruleForm.passwords = stripscript(value);
+      value = ruleForm.passwords;
+      if (value === "") {
+        callback(new Error("请再次输入密码"));
+      } else if (value != ruleForm.password) {
+        callback(new Error("两次输入密码不一致!"));
+      } else {
+        callback();
+      }
+    };
+
+    // 验证验证码
+    let validateCode = (rule, value, callback) => {
+      // 过滤后的数据
+      ruleForm.code = stripscript(value);
+      value = ruleForm.code;
+      if (value === "") {
+        return callback(new Error("请输入验证码"));
+      } else if (validateVCode(value)) {
+        return callback(new Error("验证码格式有误！"));
+      } else {
+        callback();
+      }
+    };
+
+    // 声明数据
+    // 3.0新特性 这里面放置data数据，生命周期，自定义函数
+    // reactive定义单一对象
+    const menuTab = reactive([
+      { txt: "登录", current: true, type: "login" },
+      { txt: "注册", current: false, type: "register" }
+    ]);
+    // ref定义基本类型
+    // 隐藏确认密码
+    const model = ref("login");
+    // 切换登录注册
+    const sign = ref("登录");
+
+    // 表单绑定数据
+    const ruleForm = reactive({
+      username: "",
+      password: "",
+      passwords: "",
+      code: ""
+    });
+
+    // 表单的验证
+    const rules = reactive({
+      username: [{ validator: validateUsername, trigger: "blur" }],
+      password: [{ validator: validatePassword, trigger: "blur" }],
+      passwords: [{ validator: validatePasswords, trigger: "blur" }],
+      code: [{ validator: validateCode, trigger: "blur" }]
+    });
+    // isRef判断这个值是否是基础数据类型
+    // console.log(isRef(model)?true:false)
+    // toRefs将reactive对象转为普通对象，保证对象解构或拓展运算符不会丢失原有响应式对象的响应
+    /* function obj(){
+    const pos = reactive({
+      x:1,
+      y:2
+    })
+    return toRefs(pos)
+  }
+  const {x,y} = obj();
+  console.log(x.value) */
+
+    /**
+     * 声明函数
+     */
+    // 切换tab
+    const toggleMenu = data => {
+      menuTab.forEach(elem => {
+        elem.current = false;
+      });
+      // 切换tab
+      data.current = true;
+      // 修改模块值
+      model.value = data.type;
+      // 切换登录和注册的文字
+      sign.value = data.txt;
+    };
+    // 提交表单函数
+    const submitForm = formName => {
+      refs[formName].validate(valid => {
+        if (valid) {
+          alert("submit!");
+        } else {
+          console.log("error submit!!");
+          return false;
+        }
+      });
+    };
+
+    /**
+     * 生命周期
+     */
+    // 挂在完成后
+    onMounted(() => {});
+
+    return {
+      menuTab,
+      model,
+      sign,
+      toggleMenu,
+      submitForm,
+      ruleForm,
+      rules
+    };
+  }
+};
+</script>
+<style lang="scss" scoped>
+#login {
+  height: 100vh;
+  background-color: #344a5f;
+}
+.login-wrap {
+  padding-top: 20px;
+  width: 330px;
+  margin: auto;
+}
+.menu-tab {
+  text-align: center;
+  li {
+    display: inline-block;
+    width: 88px;
+    line-height: 36px;
+    font-size: 14px;
+    color: #fff;
+    border-radius: 2px;
+    cursor: pointer;
+  }
+}
+.current {
+  background-color: rgba(0, 0, 0, 0.1);
+}
+.login-form {
+  margin-top: 29px;
+  label {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 14px;
+    color: #fff;
+  }
+  .item-form {
+    margin-bottom: 13px;
+  }
+  .block {
+    width: 100%;
+    display: block;
+  }
+  .login-btn {
+    margin-top: 19px;
+  }
+}
+</style> 
