@@ -10,7 +10,7 @@
           <div class="category-wrap">
             <div
               class="category"
-              v-for="firstItem in category.item"
+              v-for="(firstItem, index) in category.item"
               :key="firstItem.id"
             >
               <!-- 一级分类 -->
@@ -25,18 +25,32 @@
                     @click="
                       editCategory({
                         data: firstItem,
-                        type: 'category_first_edit'
+                        type: 'category_first_edit',
                       })
                     "
                     >编辑</el-button
                   >
-                  <el-button size="mini" type="success" round
+                  <el-button
+                    size="mini"
+                    type="success"
+                    round
+                    @click="
+                      handlerAddChildren({
+                        data: firstItem,
+                        type: 'category_children_add',
+                      })
+                    "
                     >添加子级</el-button
                   >
                   <el-button
                     size="mini"
                     round
-                    @click="deleteCategoryComfirm(firstItem.id)"
+                    @click="
+                      deleteCategoryComfirm({
+                        id: firstItem.id,
+                        type: 'first',
+                      })
+                    "
                     >删除</el-button
                   >
                 </div>
@@ -49,8 +63,33 @@
                 >
                   {{ childrenItem.category_name }}
                   <div class="button-group">
-                    <el-button size="mini" type="danger" round>编辑</el-button>
-                    <el-button size="mini" round>删除</el-button>
+                    <el-button
+                      size="mini"
+                      type="danger"
+                      round
+                      @click="
+                        editChildrenCategory({
+                          data: {
+                            firstItem,
+                            childrenItem,
+                          },
+                          type: 'category_children_edit',
+                        })
+                      "
+                      >编辑</el-button
+                    >
+                    <el-button
+                      size="mini"
+                      round
+                      @click="
+                        deleteChildrenCategoryComfirm({
+                          id: childrenItem.id,
+                          type: 'children',
+                          index: index,
+                        })
+                      "
+                      >删除</el-button
+                    >
                   </div>
                 </li>
               </ul>
@@ -92,7 +131,9 @@ import {
   AddFirstCategory,
   GetCategory,
   DeleteCategory,
-  EditCategory
+  EditCategory,
+  AddChildrenCategory,
+  GetCategoryAll,
 } from "@/api/news";
 import { reactive, ref, onMounted, watch } from "@vue/composition-api";
 import { global } from "@/utils/global_V3.0.js";
@@ -100,7 +141,7 @@ import { common } from "@/api/common";
 export default {
   name: "category",
   setup(props, { root, refs }) {
-    const { getInfoCategory, categoryItem } = common();
+    const { getInfoCategory, getInfoCategoryAll, categoryItem } = common();
     const { confirm, message } = global();
     // ref
     const category_first_input = ref(true);
@@ -111,17 +152,19 @@ export default {
     const submit_button_disabled = ref(true);
     const deleteId = ref("");
     const submit_button_type = ref("");
+    const delete_button_type = ref("");
+    const delete_button_index = ref();
     // reactive
     const form = reactive({
       categoryName: "",
-      secCategoryName: ""
+      secCategoryName: "",
     });
     const category = reactive({
       item: [],
-      current: []
+      current: [],
     });
     // methods vue2.0
-    // 添加一级分类
+    // 添加或者编辑分类
     const submit = () => {
       if (submit_button_type.value == "category_first_add") {
         addFirstCategory();
@@ -129,12 +172,19 @@ export default {
       if (submit_button_type.value == "category_first_edit") {
         editFirstCategory();
       }
+      if (submit_button_type.value == "category_children_add") {
+        addChildrenCategory();
+      }
+      if (submit_button_type.value == "category_children_edit") {
+       editFirstCategory();
+      }
     };
+    // 添加一级分类
     const addFirstCategory = () => {
       if (!form.categoryName) {
         message({
           type: "error",
-          message: "分类名称不能为空！！"
+          message: "一级分类名称不能为空！！",
         });
         return false;
       }
@@ -143,12 +193,12 @@ export default {
       bottonLoading(true);
       // 添加一级分类
       AddFirstCategory({ categoryName: form.categoryName })
-        .then(response => {
+        .then((response) => {
           let data = response.data;
           if (data.resCode === 0) {
             message({
               type: "success",
-              message: data.message
+              message: data.message,
             });
             category.item.push(response.data.data);
           }
@@ -157,7 +207,7 @@ export default {
           // 清空form表单
           resetFields(false);
         })
-        .catch(error => {
+        .catch((error) => {
           // 按钮加载状态
           // submit_button_loading.value = true;
           resetFields(true);
@@ -165,15 +215,91 @@ export default {
         });
     };
     // 隐藏二级分类添加框
-    const addFirst = params => {
+    const addFirst = (params) => {
       submit_button_type.value = params.type;
       console.log(submit_button_type.value);
       category_first_input.value = true;
       // 隐藏子级输入框;
       hideChildrenInput(false);
-      category_first_disabled.value = false;
+      // 启用一级输入框输入
+      hideFirstDisabled(false);
       submit_button_disabled.value = false;
       resetFields(false);
+    };
+    // 添加子级分类
+    const handlerAddChildren = (params) => {
+      // 更新确定按钮类型
+      submit_button_type.value = params.type;
+      // 存储数据
+      category.current = params.data;
+      // 显示子级输入框
+      hideChildrenInput(true);
+      // 启用子级输入框输入
+      hideChildrenDisabled(false);
+      // 禁止一级输入框输入
+      hideFirstDisabled(true);
+      // 启用确定按钮
+      submit_button_disabled.value = false;
+      // 显示一级文本
+      form.categoryName = params.data.category_name;
+    };
+    // 封装添加子级分类
+    const addChildrenCategory = () => {
+      if (!form.secCategoryName) {
+        message({
+          type: "error",
+          message: "二级分类名称不能为空！！",
+        });
+        return false;
+      }
+      let requestData = {
+        categoryName: form.secCategoryName,
+        parentId: category.current.id,
+      };
+      AddChildrenCategory(requestData)
+        .then((response) => {
+          let responseData = response.data;
+          message({
+            type: "success",
+            message: responseData.message,
+          });
+        })
+        .catch((error) => {});
+      getInfoCategoryAlls();
+      // 清空子级输入框内容
+      form.secCategoryName = "";
+    };
+    // 删除子级分类
+    const deleteChildrenCategoryComfirm = (params) => {
+      deleteId.value = params.id;
+      delete_button_type.value = params.type;
+      delete_button_index.value = params.index;
+      confirm({
+        content: "确定删除当前分类，确认后将无法恢复！！",
+        tip: "警告",
+        fn: deleteCategory,
+        catchFn: () => {
+          deleteId.value = "";
+        },
+      });
+    };
+    // 编辑子级分类
+    const editChildrenCategory = (params) => {
+      // 更新确定按钮类型
+      submit_button_type.value = params.type;
+      // 显示子级输入框
+      hideChildrenInput(true);
+      // 启用子级输入框输入
+      hideChildrenDisabled(false);
+      // 禁止一级输入框输入
+      hideFirstDisabled(true);
+      // 启用确定按钮
+      submit_button_disabled.value = false;
+      // 显示一级文本
+      form.categoryName = params.data.firstItem.category_name;
+      // 显示二级文本
+      form.secCategoryName = params.data.childrenItem.category_name;
+      category.current = params.data.childrenItem;
     };
     // 获取一级分类资源(被优化)
     /*  const getCategory = () => {
@@ -187,76 +313,103 @@ export default {
         });
     }; */
     // 删除一级分类
-    const deleteCategoryComfirm = categoryId => {
-      deleteId.value = categoryId;
+    const deleteCategoryComfirm = (params) => {
+      deleteId.value = params.id;
+      delete_button_type.value = params.type;
       confirm({
         content: "确定删除当前分类，确认后将无法恢复！！",
         tip: "警告",
         fn: deleteCategory,
         catchFn: () => {
           deleteId.value = "";
-        }
+        },
       });
     };
     // 删除分类封装函数
     const deleteCategory = () => {
       DeleteCategory({ categoryId: deleteId.value })
-        .then(response => {
+        .then((response) => {
           let data = response.data;
           if (data.resCode === 0) {
             // 第一种更新页面方法
             // 使用es6的findIndex找到这个id所在数组的下标
-            /*  let index = category.item.findIndex(
+            /*    let index = category.item.findIndex(
               item => item.id == deleteId.value
             );
             // 删除数组指定元素
             category.item.splice(index, 1); */
             // 第二种更新页面方法
             // 使用es6的filter方法直接对比看数组里面的id和删除之后的有什么不同，如果对比的id不等于数组里面任意id就返回一个新的数组数据更新渲染到页面
-            let newData = category.item.filter(
-              item => item.id != deleteId.value
-            );
-            category.item = newData;
+            let newData;
+            if (delete_button_type.value == "first") {
+              newData = category.item.filter(
+                (item) => item.id != deleteId.value
+              );
+              category.item = newData;
+            }
+            if (delete_button_type.value == "children") {
+              let index = category.item[
+                delete_button_index.value
+              ].children.findIndex((item) => item.id == deleteId.value);
+              // 删除数组指定元素
+              category.item[delete_button_index.value].children.splice(
+                index,
+                1
+              );
+            }
             message({
               type: "success",
-              message: data.message
+              message: data.message,
             });
           }
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     };
     // 编辑分类
-    const editCategory = params => {
+    const editCategory = (params) => {
+      console.log(params);
       submit_button_type.value = params.type;
       console.log(submit_button_type.value);
       // 隐藏子级输入框
       hideChildrenInput(false);
-      category_first_disabled.value = false;
-      category_children_disabled.value = false;
+      // 启用一级输入框输入
+      hideFirstDisabled(false);
+      // 启用子级输入框输入
+      hideChildrenDisabled(false);
       submit_button_disabled.value = false;
       form.categoryName = params.data.category_name;
       category.current = params.data;
     };
+    // 封装编辑分类函数
     const editFirstCategory = () => {
       if (category.current.length == 0) {
         message({
           message: "未选择分类！！",
-          type: "error"
+          type: "error",
         });
         return false;
       }
-      let requestData = {
-        id: category.current.id,
-        categoryName: form.categoryName
-      };
+      let requestData;
+      if (submit_button_type.value == "category_first_edit") {
+        requestData = {
+          id: category.current.id,
+          categoryName: form.categoryName,
+        };
+      }
+      if (submit_button_type.value == "category_children_edit") {
+        requestData = {
+          id: category.current.id,
+          categoryName: form.secCategoryName,
+        };
+      }
       EditCategory(requestData)
-        .then(response => {
+        .then((response) => {
           let resdata = response.data;
           message({
             message: resdata.message,
-            type: "success"
+            type: "success",
           });
           category.current.category_name = resdata.data.data.categoryName;
           // let data = category.item.filter(
@@ -266,23 +419,38 @@ export default {
           resetFields(false);
           category.current = [];
         })
-        .catch(error => {
+        .catch((error) => {
           console.log(error);
         });
     };
     // 封装清除form表单
-    const resetFields = flag => {
+    const resetFields = (flag) => {
       bottonLoading(flag);
       form.categoryName = "";
       form.secCategoryName = "";
     };
     // 禁用按钮状态
-    const bottonLoading = flag => {
+    const bottonLoading = (flag) => {
       submit_button_loading.value = flag;
     };
     // 隐藏子级输入框
-    const hideChildrenInput = flag => {
+    const hideChildrenInput = (flag) => {
       category_children_input.value = flag;
+    };
+    // 禁止或者启用子级输入框输入
+    const hideChildrenDisabled = (flag) => {
+      category_children_disabled.value = flag;
+    };
+    // 禁止一级输入框输入
+    const hideFirstDisabled = (flag) => {
+      category_first_disabled.value = flag;
+    };
+    // 封装获取全部分类
+    const getInfoCategoryAlls = () => {
+      root.$store.dispatch("common/getInfoCategoryAll").then((res) => {
+        // console.log(res);
+        category.item = res;
+      });
     };
     // 生命周期
     // 挂载完成时执行，（页面DOM元素完成时，实际完成）
@@ -292,9 +460,10 @@ export default {
       // getInfoCategory();
       // vuex
       // 获取一级分类资源
-      root.$store.dispatch("common/getInfoCategory").then(res => {
+      /*  root.$store.dispatch("common/getInfoCategory").then((res) => {
         category.item = res;
-      });
+      }); */
+      getInfoCategoryAlls();
     });
     // 监听获取一级分类数据的变化
     /*  watch(
@@ -318,9 +487,12 @@ export default {
       submit,
       addFirst,
       deleteCategoryComfirm,
-      editCategory
+      editCategory,
+      handlerAddChildren,
+      deleteChildrenCategoryComfirm,
+      editChildrenCategory,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
