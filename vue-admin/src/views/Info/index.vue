@@ -115,7 +115,7 @@
           >
             删除
           </el-button>
-          <el-button type="success" size="mini" @click="dialog_info = true"
+          <el-button type="success" size="mini" @click="editInfo(scope.row.id)"
             >编辑</el-button
           >
         </template>
@@ -144,11 +144,23 @@
     <!-- 需要逻辑运算的时候就要用第一种 -->
     <!-- <DialogInfo :flag="dialog_info" @close="closeDialog" /> -->
     <!-- 不需要逻辑运算用这种有修饰器的 -->
-    <DialogInfo :flag.sync="dialog_info" :category="options.category" />
+    <DialogInfo
+      :flag.sync="dialog_info"
+      :category="options.category"
+      @getListEmit="getList"
+    />
+    <!-- 编辑的弹窗 -->
+    <DialogEditInfo
+      :flag.sync="dialog_info_edit"
+      :category="options.category"
+      :id="infoId"
+      @getListEmit="getList"
+    />
   </div>
 </template>
 <script>
 import DialogInfo from "./dialog/info";
+import DialogEditInfo from "./dialog/edit";
 import { global } from "@/utils/global_V3.0.js";
 import { GetCategory, GetList, DeleteInfo } from "@/api/news";
 import { common } from "@/api/common";
@@ -158,6 +170,7 @@ export default {
   name: "InfoIndex",
   components: {
     DialogInfo,
+    DialogEditInfo,
   },
   setup(props, { root }) {
     const { getInfoCategory, categoryItem } = common();
@@ -187,6 +200,7 @@ export default {
     });
     // 信息弹窗标记
     const dialog_info = ref(false);
+    const dialog_info_edit = ref(false);
     // 你要选择的那个的信息分类
     const category_value = ref("");
     const search_key = ref("id");
@@ -195,6 +209,7 @@ export default {
     const total = ref(0);
     const deleteInfoId = ref("");
     const loadingData = ref(false);
+    const infoId = ref("");
     // vue2.0 methods
     // 需要显示多少条数据
     const handleSizeChange = (val) => {
@@ -246,7 +261,7 @@ export default {
       deleteInfoId.value = id;
     };
     // 搜索
-  /*   const search = () => {
+    /*   const search = () => {
       let resquestData = formatData();
       getList();
     }; */
@@ -272,7 +287,11 @@ export default {
 
       return resquestData;
     };
-
+    // 编辑数据
+    const editInfo = (id) => {
+      infoId.value = id;
+      dialog_info_edit.value = true;
+    };
     const getList = () => {
       /* let resquestData = {
         categoryId: "",
@@ -288,7 +307,7 @@ export default {
       GetList(resquestData)
         .then((respones) => {
           let data = respones.data.data;
-          console.log(data);
+          // console.log(data);
           // 表格数据
           table_data.item = data.data;
           // 页码数量
@@ -318,7 +337,7 @@ export default {
       // vue3.0
       // getInfoCategory();
       // vuex
-      root.$store.dispatch("common/getInfoCategory").then((res) => {
+      root.$store.dispatch("common/getInfoCategoryAll").then((res) => {
         options.category = res;
       });
       getList();
@@ -335,12 +354,14 @@ export default {
       table_data,
       // ref
       dialog_info,
+      dialog_info_edit,
       category_value,
       search_key,
       date_value,
       search_keyWork,
       total,
       loadingData,
+      infoId,
       // methods
       handleSizeChange,
       handleCurrentChange,
@@ -350,6 +371,7 @@ export default {
       toCategory,
       handleSelectionChange,
       getList,
+      editInfo,
     };
   },
 };
