@@ -16,6 +16,8 @@
 
 提交：git commit -m "这里是当前提交的描述"
 
+git commit --amend（可以修改最后一次提交的信息.但是如果你已经push过了，那么其历史最后一次，永远也不能修改了）
+
 拉取：git pull
 
 推送：git push
