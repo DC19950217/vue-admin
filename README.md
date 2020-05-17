@@ -26,7 +26,7 @@ git commit --amend（可以修改最后一次提交的信息.但是如果你已�
 
 查看分支（包含远程分支）：git branch -a
 
-合并分支：git merge --on-ff -m '描述' <name>
+合并分支：git merge --no-ff -m '描述' <name>
 
 删除远程分支：git push origin --delete <name>
 
