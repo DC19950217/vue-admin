@@ -1,5 +1,6 @@
 import {
-  GetCategory
+  GetCategory,
+  GetCategoryAll
 } from "@/api/news";
 const actions = {
   getInfoCategory(commit, repuestData) {
@@ -10,7 +11,15 @@ const actions = {
         reject(error)
       })
     })
-
+  },
+  getInfoCategoryAll(commit, repuestData) {
+    return new Promise((resolve, reject) => {
+      GetCategoryAll({}).then(response => {
+        resolve(response.data.data);
+      }).catch(error => {
+        reject(error)
+      })
+    })
   }
 }
 export default {
