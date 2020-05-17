@@ -15,6 +15,15 @@ export function AddFirstCategory(data) {
     })
 }
 
+// 子级分类添加
+export function AddChildrenCategory(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/addChildrenCategory/',
+        data
+    })
+}
+
 // 获取分类
 export function GetCategory(data) {
     return serveice.request({
@@ -23,6 +32,16 @@ export function GetCategory(data) {
         data
     })
 }
+
+// 获取所有分类（包含子级）
+export function GetCategoryAll(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/getCategoryAll/',
+        data
+    })
+}
+
 
 // 删除分类
 export function DeleteCategory(data) {
@@ -64,6 +83,17 @@ export function DeleteInfo(data) {
     return serveice.request({
         method: 'post',
         url: '/news/deleteInfo/',
+        data
+    })
+}
+
+
+// 编辑信息
+
+export function EditInfo(data) {
+    return serveice.request({
+        method: 'post',
+        url: '/news/editInfo/',
         data
     })
 }
