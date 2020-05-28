@@ -92,7 +92,7 @@
       @selection-change="handleSelectionChange"
     >
       <el-table-column type="selection" width="45"> </el-table-column>
-      <el-table-column prop="title" label="标题" width="400"></el-table-column>
+      <el-table-column prop="title" label="标题" width="295"></el-table-column>
       <el-table-column
         prop="categoryId"
         label="类型"
@@ -118,6 +118,9 @@
           <el-button type="success" size="mini" @click="editInfo(scope.row.id)"
             >编辑</el-button
           >
+          <el-button type="success" size="mini" @click="detailed(scope.row)">
+            编辑详情
+          </el-button>
         </template>
       </el-table-column>
     </el-table>
@@ -170,33 +173,33 @@ export default {
   name: "InfoIndex",
   components: {
     DialogInfo,
-    DialogEditInfo,
+    DialogEditInfo
   },
   setup(props, { root }) {
     const { getInfoCategory, categoryItem } = common();
     const { confirm, message } = global();
     const options = reactive({
-      category: [],
+      category: []
     });
     //搜索关键字
     const search_option = reactive([
       {
         value: "id",
-        label: "ID",
+        label: "ID"
       },
       {
         value: "title",
-        label: "标题",
-      },
+        label: "标题"
+      }
     ]);
     // 表格数据
     const table_data = reactive({
-      item: [],
+      item: []
     });
     // 页码
     const page = reactive({
       pageNumber: 1,
-      pageSize: 10,
+      pageSize: 10
     });
     // 信息弹窗标记
     const dialog_info = ref(false);
@@ -212,22 +215,22 @@ export default {
     const infoId = ref("");
     // vue2.0 methods
     // 需要显示多少条数据
-    const handleSizeChange = (val) => {
+    const handleSizeChange = val => {
       page.pageSize = val;
       getList();
     };
     // 下一页数据
-    const handleCurrentChange = (val) => {
+    const handleCurrentChange = val => {
       page.pageNumber = val;
       getList();
     };
     // 是否删除信息确认弹窗
-    const deleteItem = (id) => {
+    const deleteItem = id => {
       deleteInfoId.value = [id];
       confirm({
         content: "确定删除当前信息，确认后将无法恢复！！",
         tip: "警告",
-        fn: confirmDelete,
+        fn: confirmDelete
       });
     };
     // 删除所有选中的数据
@@ -235,29 +238,29 @@ export default {
       if (!deleteInfoId.value || deleteInfoId.length == 0) {
         message({
           type: "error",
-          message: "请选择要删除的数据！！",
+          message: "请选择要删除的数据！！"
         });
         return false;
       }
       confirm({
         content: "确定删除选择的数据，确认后将无法恢复！！",
-        fn: confirmDelete,
+        fn: confirmDelete
       });
     };
     // 删除数据处理函数
-    const confirmDelete = (value) => {
-      DeleteInfo({ id: deleteInfoId.value }).then((respones) => {
+    const confirmDelete = value => {
+      DeleteInfo({ id: deleteInfoId.value }).then(respones => {
         message({
           type: "success",
-          message: respones.data.message,
+          message: respones.data.message
         });
         deleteInfoId.value = "";
         getList();
       });
     };
     // 处理选中函数
-    const handleSelectionChange = (val) => {
-      let id = val.map((item) => item.id);
+    const handleSelectionChange = val => {
+      let id = val.map(item => item.id);
       deleteInfoId.value = id;
     };
     // 搜索
@@ -269,7 +272,7 @@ export default {
     const formatData = () => {
       let resquestData = {
         pageNumber: page.pageNumber,
-        pageSize: page.pageSize,
+        pageSize: page.pageSize
       };
       // 分类id
       if (category_value.value) {
@@ -288,7 +291,7 @@ export default {
       return resquestData;
     };
     // 编辑数据
-    const editInfo = (id) => {
+    const editInfo = id => {
       infoId.value = id;
       dialog_info_edit.value = true;
     };
@@ -305,7 +308,7 @@ export default {
       let resquestData = formatData();
       loadingData.value = true;
       GetList(resquestData)
-        .then((respones) => {
+        .then(respones => {
           let data = respones.data.data;
           // console.log(data);
           // 表格数据
@@ -314,7 +317,7 @@ export default {
           total.value = data.total;
           loadingData.value = false;
         })
-        .catch((error) => {
+        .catch(error => {
           loadingData.value = false;
           console.log(error);
         });
@@ -324,12 +327,39 @@ export default {
       return timestampToTime(row.createDate);
     };
     // 匹配分类
-    const toCategory = (row) => {
+    const toCategory = row => {
       let categoryId = row.categoryId;
       let categoryData = options.category.filter(
-        (item) => item.id == categoryId
+        item => item.id == categoryId
       )[0];
       return categoryData.category_name;
+    };
+    // 信息详情
+    const detailed = data => {
+    /*   root.$store.commit("infoDetailed/SET_ID", data.id);
+      root.$store.commit("infoDetailed/SET_TITLE", data.title); */
+      root.$store.commit("infoDetailed/UPDATE_STATE_VALUE", {
+        id: {
+          value: data.id,
+          sessionKey: "infoId",
+          session: true
+        },
+        title: {
+          value: data.title,
+          sessionKey: "infoTitle",
+          session: true
+        }
+      });
+      /*  root.$router.push({
+        path:`/infoDetailed/${data.id}/${data.title}`
+      }) */
+      root.$router.push({
+        name: "InfoDetailed",
+        params: {
+          id: data.id,
+          title: data.title
+        }
+      });
     };
     // 生命周期
     // 挂载完成时执行，（页面DOM元素完成时，实际完成）
@@ -337,7 +367,7 @@ export default {
       // vue3.0
       // getInfoCategory();
       // vuex
-      root.$store.dispatch("common/getInfoCategoryAll").then((res) => {
+      root.$store.dispatch("common/getInfoCategoryAll").then(res => {
         options.category = res;
       });
       getList();
@@ -372,8 +402,9 @@ export default {
       handleSelectionChange,
       getList,
       editInfo,
+      detailed
     };
-  },
+  }
 };
 </script>
 <style lang="scss" scoped>
