@@ -220,7 +220,7 @@ export default {
       getList();
     };
     // 下一页数据
-    const handleCurrentChange = val => {
+    const handleCurrentChange = () => {
       page.pageNumber = val;
       getList();
     };
@@ -336,7 +336,7 @@ export default {
     };
     // 信息详情
     const detailed = data => {
-    /*   root.$store.commit("infoDetailed/SET_ID", data.id);
+      /*   root.$store.commit("infoDetailed/SET_ID", data.id);
       root.$store.commit("infoDetailed/SET_TITLE", data.title); */
       root.$store.commit("infoDetailed/UPDATE_STATE_VALUE", {
         id: {
