@@ -5,6 +5,7 @@ import {
 import {
   reactive
 } from "@vue/composition-api";
+import server from "../utils/request";
 export function common() {
   const categoryItem = reactive({
     item: []
@@ -36,4 +37,12 @@ export function common() {
     getInfoCategoryAll,
     categoryItem
   }
+}
+// 获取七牛云token
+export function QiniuToKen(data) {
+  return server.request({
+    method: "POST",
+    url: "/uploadImgToken/",
+    data
+  })
 }
