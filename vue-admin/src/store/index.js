@@ -5,13 +5,15 @@ Vue.use(Vuex);
 import app from "./modules/app";
 import login from "./modules/login";
 import common from './modules/common';
+import infoDetailed from './modules/infoDetailed';
 
 
 export default new Vuex.Store({
-  modules:{
+  modules: {
     app,
     login,
-    common
+    common,
+    infoDetailed
   }
 });
 

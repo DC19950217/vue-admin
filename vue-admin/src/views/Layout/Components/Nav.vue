@@ -25,12 +25,14 @@
             <span slot="title">{{ item.meta.name }}</span>
           </template>
           <!-- 子级菜单 -->
-          <el-menu-item
-            v-for="subItem in item.children"
-            :key="subItem.id"
-            :index="subItem.path"
-            >{{ subItem.meta.name }}</el-menu-item
-          >
+          <template v-for="subItem in item.children">
+            <el-menu-item
+              v-if="!subItem.hidden"
+              :key="subItem.id"
+              :index="subItem.path"
+              >{{ subItem.meta.name }}</el-menu-item
+            >
+          </template>
         </el-submenu>
       </template>
     </el-menu>
@@ -42,7 +44,7 @@ import {
   ref,
   toRefs,
   onMounted,
-  computed
+  computed,
 } from "@vue/composition-api";
 export default {
   name: "navMenu",
@@ -55,9 +57,9 @@ export default {
 
     return {
       isCollapse,
-      routers
+      routers,
     };
-  }
+  },
 };
 </script>
 <style lang="scss" scoped>
@@ -67,7 +69,7 @@ export default {
   img {
     margin: 28px auto 25px;
     width: 92px;
-    @include webkit(transition,all .3s ease 0s);
+    @include webkit(transition, all 0.3s ease 0s);
   }
 }
 #nav-wrap {
@@ -76,7 +78,7 @@ export default {
   left: 0;
   height: 100vh;
   background-color: #344a5f;
-  @include webkit(transition,all .3s ease 0s);
+  @include webkit(transition, all 0.3s ease 0s);
   svg {
     font-size: 20px;
     margin-right: 10px;
@@ -91,8 +93,8 @@ export default {
   #nav-wrap {
     width: $navMenuMin;
   }
-  .logo img{
-      width: 70%;
+  .logo img {
+    width: 70%;
   }
 }
 </style>
