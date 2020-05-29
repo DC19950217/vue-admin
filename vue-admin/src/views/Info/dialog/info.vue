@@ -12,7 +12,7 @@
         :label-width="data.formLabelWidth"
         prop="category"
       >
-        <el-select v-model="data.form.category" placeholder="请选择活动区域">
+        <el-select v-model="data.form.category" placeholder="请选择分类">
           <el-option
             v-for="item in data.categoryOption"
             :key="item.id"
@@ -53,14 +53,15 @@ export default {
   props: {
     flag: {
       type: Boolean,
-      default: false,
+      default: false
     },
     category: {
       type: Array,
-      default: () => [],
-    },
+      default: () => []
+    }
   },
   setup(props, { emit, root, refs }) {
+    console.log(props.category)
     const data = reactive({
       dialog_info_flag: false, //弹窗标记
       formLabelWidth: "70px",
@@ -69,9 +70,9 @@ export default {
         //表单数据
         category: "",
         title: "",
-        content: "",
+        content: ""
       },
-      categoryOption: [], //下拉分类
+      categoryOption: [] //下拉分类
     });
     const { message } = global();
     const close = () => {
@@ -88,40 +89,40 @@ export default {
       let requestData = {
         category: data.form.category,
         title: data.form.title,
-        content: data.form.content,
+        content: data.form.content
       };
       if (!data.form.category) {
         message({
           type: "error",
-          message: "分类不能为空！！",
+          message: "分类不能为空！！"
         });
         return false;
       } else if (!data.form.title) {
         message({
           type: "error",
-          message: "标题不能为空！！",
+          message: "标题不能为空！！"
         });
         return false;
       } else if (!data.form.content) {
         message({
           type: "error",
-          message: "内容不能为空！！",
+          message: "内容不能为空！！"
         });
         return false;
       }
       submitLoadingFn(true);
       AddInfo(requestData)
-        .then((response) => {
+        .then(response => {
           let requestData = response.data;
           message({
             type: "success",
-            message: requestData.message,
+            message: requestData.message
           });
           submitLoadingFn(false);
           emit("getListEmit");
           resetForm();
         })
-        .catch((error) => {
+        .catch(error => {
           console.log(error);
           submitLoadingFn(false);
         });
@@ -134,11 +135,12 @@ export default {
       data.form.content = ""; */
     };
     // 禁用按钮
-    const submitLoadingFn = (flag) => {
+    const submitLoadingFn = flag => {
       data.submitLoading = flag;
     };
 
-    onMounted(() => {});
+    onMounted(() => {
+    });
     watch(() => {
       data.dialog_info_flag = props.flag;
     });
@@ -149,9 +151,9 @@ export default {
       // vue2.0 methods
       close,
       openDialog,
-      submit,
+      submit
     };
-  },
+  }
 };
 </script>
 <style lang="scss" scoped></style>
