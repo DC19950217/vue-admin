@@ -44,15 +44,7 @@
         <div class="label-wrap key-work">
           <label for="">关键字：</label>
           <div class="warp-content">
-            <el-select v-model="search_key" style="width:100%;">
-              <el-option
-                v-for="item in search_option"
-                :key="item.value"
-                :label="item.label"
-                :value="item.value"
-              >
-              </el-option>
-            </el-select>
+            <SelectVue :config="data.configOption" />
           </div>
         </div>
       </el-col>
@@ -164,6 +156,7 @@
 <script>
 import DialogInfo from "./dialog/info";
 import DialogEditInfo from "./dialog/edit";
+import SelectVue from "@/components/Select";
 import { global } from "@/utils/global_V3.0.js";
 import { GetCategory, GetList, DeleteInfo } from "@/api/news";
 import { common } from "@/api/common";
@@ -173,9 +166,15 @@ export default {
   name: "InfoIndex",
   components: {
     DialogInfo,
-    DialogEditInfo
+    DialogEditInfo,
+    SelectVue
   },
   setup(props, { root }) {
+    const data = reactive({
+      configOption: {
+        init: ["id", "title"]
+      }
+    });
     const { getInfoCategory, categoryItem } = common();
     const { confirm, message } = global();
     const options = reactive({
@@ -379,6 +378,7 @@ export default {
 
     return {
       // reactive
+      data,
       options,
       search_option,
       table_data,
