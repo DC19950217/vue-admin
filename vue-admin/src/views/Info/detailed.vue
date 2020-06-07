@@ -34,6 +34,7 @@
         v-model="form.content"
         ref="myQuillEditor"
         :options="data.editorOption"
+        @change="onEditorChange($event)"
       />
     </el-form-item>
 
@@ -104,8 +105,6 @@ export default {
       };
       GetList(requestData).then(response => {
         let responseData = response.data.data.data[0];
-        console.log(responseData);
-
         form.categoryId = responseData.categoryId;
         form.title = responseData.title;
         form.createDate = timestampToTime(responseData.createDate);
@@ -141,6 +140,10 @@ export default {
     const submitLoadingFn = flag => {
       data.submitLoading = flag;
     };
+    // 富文本内容发生变化
+    const onEditorChange = event => {
+      console.log(event);
+    };
     onMounted(() => {
       getInfoCategory();
       getInfo();
@@ -149,7 +152,8 @@ export default {
       data,
       form,
       submit,
-      uploadImgConfig
+      uploadImgConfig,
+      onEditorChange
     };
   }
 };
