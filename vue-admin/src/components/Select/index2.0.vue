@@ -26,6 +26,9 @@ export default {
       ]
     };
   },
+  mounted() {
+    this.initOption();
+  },
   methods: {
     initOption() {
       let initData = this.config.init;
