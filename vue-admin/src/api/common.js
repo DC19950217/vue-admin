@@ -46,3 +46,11 @@ export function QiniuToKen(data) {
     data
   })
 }
+// 请求表格数据
+export function loadTableData(params) {
+  return server.request({
+    method: params.method || "post",
+    url: params.url,
+    data: params.data || {}
+  })
+}
