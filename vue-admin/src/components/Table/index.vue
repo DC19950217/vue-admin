@@ -45,6 +45,8 @@ import {
   watch,
   onBeforeMount
 } from "@vue/composition-api";
+import { requestUrl } from "@/api/requestUrl";
+import { loadTableData } from "@/api/common";
 export default {
   name: "tableVue",
   props: {
@@ -58,6 +60,7 @@ export default {
       tableConfig: {
         selection: true,
         recordCheckbox: false,
+        requestData: {},
         tHead: []
       },
       tableData: [
@@ -77,17 +80,35 @@ export default {
         }
       ]
     });
-    const handleSelectionChange = () => {};
-    const initTableConfig = () => {
+    let handleSelectionChange = () => {};
+    let loadData = () => {
+      let requestJson = data.tableConfig.requestData;
+      let requestData = {
+        url: requestUrl[requestJson.url],
+        method: requestJson.method,
+        data: requestJson.data
+      };
+      loadTableData(requestData)
+        .then(response => {
+          let result = response.data.data.data;
+          if (result && result.length > 0) {
+            data.tableData = result;
+          }
+        })
+        .catch(error => {});
+    };
+    let initTableConfig = () => {
       let configData = props.config;
+      let keys = Object.keys(data.tableConfig);
       for (let key in configData) {
-        if (data.tableConfig[key]) {
+        if (keys.includes(key)) {
           data.tableConfig[key] = configData[key];
         }
       }
     };
     onBeforeMount(() => {
       initTableConfig();
+      loadData();
     });
     return {
       data,
