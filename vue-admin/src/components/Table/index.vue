@@ -45,8 +45,7 @@ import {
   watch,
   onBeforeMount
 } from "@vue/composition-api";
-import { requestUrl } from "@/api/requestUrl";
-import { loadTableData } from "@/api/common";
+import { loadData } from "./tableLoadData";
 export default {
   name: "tableVue",
   props: {
@@ -56,6 +55,7 @@ export default {
     }
   },
   setup(props, { root }) {
+    const { tableData, tableLoadData } = loadData();
     const data = reactive({
       tableConfig: {
         selection: true,
@@ -81,22 +81,7 @@ export default {
       ]
     });
     let handleSelectionChange = () => {};
-    let loadData = () => {
-      let requestJson = data.tableConfig.requestData;
-      let requestData = {
-        url: requestUrl[requestJson.url],
-        method: requestJson.method,
-        data: requestJson.data
-      };
-      loadTableData(requestData)
-        .then(response => {
-          let result = response.data.data.data;
-          if (result && result.length > 0) {
-            data.tableData = result;
-          }
-        })
-        .catch(error => {});
-    };
+
     let initTableConfig = () => {
       let configData = props.config;
       let keys = Object.keys(data.tableConfig);
@@ -106,9 +91,13 @@ export default {
         }
       }
     };
+    watch(
+      () => tableData.item,
+      (newValue, oldValue) => (data.tableData = newValue)
+    );
     onBeforeMount(() => {
       initTableConfig();
-      loadData();
+      tableLoadData(data.tableConfig.requestData);
     });
     return {
       data,
