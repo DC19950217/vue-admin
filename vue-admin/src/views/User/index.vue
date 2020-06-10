@@ -62,7 +62,7 @@ export default {
         selection: true,
         tHead: [
           { label: "邮箱/用户名", field: "email", width: 180 },
-          { label: "真实姓名", field: "name", width: 100 },
+          { label: "真实姓名", field: "title", width: 100 },
           { label: "手机号", field: "phone", width: 110 },
           { label: "地区", field: "address" },
           { label: "角色", field: "role", width: 80 },
