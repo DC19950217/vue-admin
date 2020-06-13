@@ -87,7 +87,9 @@ export default {
             pageNumber: 1,
             pageSize: 10
           }
-        }
+        },
+        paginationLayout: "total, sizes, prev, pager, next, jumper",
+        paginationShow: true
       }
     });
     const operation = params => {
