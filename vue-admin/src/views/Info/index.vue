@@ -219,7 +219,7 @@ export default {
       getList();
     };
     // 下一页数据
-    const handleCurrentChange = () => {
+    const handleCurrentChange = (val) => {
       page.pageNumber = val;
       getList();
     };
