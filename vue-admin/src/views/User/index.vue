@@ -20,7 +20,10 @@
         </div>
       </el-col>
       <el-col :span="4"
-        ><el-button type="danger" class="pull-right"
+        ><el-button
+          type="danger"
+          class="pull-right"
+          @click="data.dialog_add = true"
           >添加用户</el-button
         ></el-col
       >
@@ -44,17 +47,20 @@
         >
       </template>
     </TableVue>
+    <DialogAdd :flag.sync="data.dialog_add" />
   </div>
 </template>
 <script>
 import { reactive, ref, onMounted, watch } from "@vue/composition-api";
 import SelectVue from "@/components/Select";
 import TableVue from "@/components/Table";
+import DialogAdd from "./dialog/add";
 export default {
   name: "userIndex",
-  components: { SelectVue, TableVue },
+  components: { SelectVue, TableVue, DialogAdd },
   setup(props) {
     const data = reactive({
+      dialog_add: false,
       configOption: {
         init: ["name", "phone", "email"]
       },
