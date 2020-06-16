@@ -13,6 +13,9 @@
 .black-space-30 {
   height: 30px;
 }
+.overflow-h {
+  overflow: hidden;
+}
 
 @for $i from 1 through 110 {
   .margin-left-#{$i} {
