@@ -54,3 +54,13 @@ export function loadTableData(params) {
     data: params.data || {}
   })
 }
+/* 
+请求省、市、区、街道数据
+*/
+export function GetCityPicker(data) {
+  return server.request({
+    method: "post",
+    url: "/cityPicker/",
+    data: data
+  })
+}
