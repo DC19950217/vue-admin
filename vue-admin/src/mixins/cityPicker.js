@@ -100,7 +100,6 @@ export default function cityPicker() {
   const result = () => {
     for (const key in resultData) {
       resultData[key] = data[key]
-      console.log(resultData)
     }
   }
   return {
