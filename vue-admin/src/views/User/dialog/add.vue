@@ -39,25 +39,33 @@
         :label-width="data.formLabelWidth"
         prop="content"
       >
-       <!--  <CityPickerVue
+        <!--  <CityPickerVue
           :cityPickerLevel="['province', 'city', 'area']"
           :cityPickerData.sync="data.cityPickerData"
         /> -->
-         <CityPickerVue
-          :cityPickerData.sync="data.cityPickerData"
-        />
+        <CityPickerVue :cityPickerData.sync="data.cityPickerData" />
       </el-form-item>
       <el-form-item
         label="是否启用："
         :label-width="data.formLabelWidth"
         prop="content"
       >
+        <el-radio v-model="data.roleStatus" label="1">禁用</el-radio>
+        <el-radio v-model="data.roleStatus" label="2">启用</el-radio>
       </el-form-item>
       <el-form-item
         label="角色："
         :label-width="data.formLabelWidth"
         prop="content"
       >
+        <el-checkbox-group v-model="data.roleCode">
+          <el-checkbox
+            v-for="item in data.roleItem"
+            :label="item.role"
+            :key="item.role"
+            >{{ item.name }}
+          </el-checkbox>
+        </el-checkbox-group>
       </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
@@ -69,9 +77,16 @@
   </el-dialog>
 </template>
 <script>
-import { reactive, ref, watch, onMounted } from "@vue/composition-api";
+import {
+  reactive,
+  ref,
+  watch,
+  onMounted,
+  onBeforeMount
+} from "@vue/composition-api";
 import CityPickerVue from "@/components/CityPicker";
 import { AddInfo } from "@/api/news";
+import { GetRole } from "@/api/user";
 import { global } from "@/utils/global_V3.0.js";
 export default {
   name: "dialogInfo",
@@ -99,7 +114,13 @@ export default {
       },
       categoryOption: [], //下拉分类
       // 城市数据
-      cityPickerData: {}
+      cityPickerData: {},
+      // 是否启用状态
+      roleStatus: "1",
+      // 角色
+      roleCode: ["A"],
+      // 角色选择
+      roleItem: []
     });
     const { message } = global();
     const close = () => {
@@ -107,8 +128,9 @@ export default {
       resetForm();
       emit("update:flag", false);
     };
-    // 缓存父组件传过来的数据
+    // 窗口打开，动画结束时
     const openDialog = () => {
+      getRole();
       data.categoryOption = props.category;
     };
     // 添加信息
@@ -165,8 +187,15 @@ export default {
     const submitLoadingFn = flag => {
       data.submitLoading = flag;
     };
-
-    onMounted(() => {});
+    // 请求角色
+    const getRole = () => {
+      GetRole()
+        .then(response => {
+          let result = response.data.data;
+          data.roleItem = result;
+        })
+        .catch(err => {});
+    };
     watch(() => {
       data.dialog_info_flag = props.flag;
     });
