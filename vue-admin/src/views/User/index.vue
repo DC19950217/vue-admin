@@ -29,22 +29,31 @@
       >
     </el-row>
     <div class="black-space-30"></div>
-    <TableVue :config="data.configTable">
+    <TableVue
+      ref="userTable"
+      :config="data.configTable"
+      :tableRow.sync="data.tablerow"
+    >
       <template v-slot:status="slotData">
         <el-switch
-          v-model="slotData.data.role"
+          v-model="slotData.data.status"
           active-color="#13ce66"
           inactive-color="#ff4949"
+          active-value="2"
+          inactive-value="1"
         >
         </el-switch>
       </template>
       <template v-slot:operation="slotData">
-        <el-button type="danger" size="small" @click="operation(slotData.data)"
+        <el-button type="danger" size="small" @click="handlerDel(slotData.data)"
           >删除</el-button
         >
         <el-button type="success" size="small" @click="operation(slotData.data)"
           >编辑</el-button
         >
+      </template>
+      <template v-slot:tobleFooterLeft>
+        <el-button size="small" @click="handelBatchDel">批量删除</el-button>
       </template>
     </TableVue>
     <DialogAdd :flag.sync="data.dialog_add" />
@@ -52,14 +61,25 @@
 </template>
 <script>
 import { reactive, ref, onMounted, watch } from "@vue/composition-api";
+// 封装的方法
+import { global } from "@/utils/global_V3.0.js";
+// 组件
 import SelectVue from "@/components/Select";
 import TableVue from "@/components/Table";
 import DialogAdd from "./dialog/add";
+// 中央事件
+import Bus from "@/utils/bus";
+
+import { UserDel } from "@/api/user";
 export default {
   name: "userIndex",
   components: { SelectVue, TableVue, DialogAdd },
-  setup(props) {
+  setup(props, { root, refs }) {
+    const { confirm, message } = global();
+    const userTable = ref(null);
     const data = reactive({
+      // table选择的数据
+      tablerow: {},
       dialog_add: false,
       configOption: {
         init: ["name", "phone", "email"]
@@ -67,10 +87,10 @@ export default {
       configTable: {
         selection: true,
         tHead: [
-          { label: "邮箱/用户名", field: "email", width: 180 },
-          { label: "真实姓名", field: "title", width: 100 },
+          { label: "邮箱/用户名", field: "username", width: 180 },
+          { label: "真实姓名", field: "truename", width: 100 },
           { label: "手机号", field: "phone", width: 110 },
-          { label: "地区", field: "address" },
+          { label: "地区", field: "region" },
           { label: "角色", field: "role", width: 80 },
           {
             label: "禁启用状态",
@@ -101,9 +121,49 @@ export default {
     const operation = params => {
       console.log(params);
     };
+    const handlerDel = params => {
+      data.tablerow.idItem = [params.id];
+      confirm({
+        content: "确定删除选择的数据，确认后将无法恢复！！",
+        fn: UserDelete
+      });
+    };
+    // 删除数据
+    const handelBatchDel = () => {
+      let userId = data.tablerow.idItem;
+      if (!userId || userId.length === 0) {
+        message({
+          message: "请勾选要删除的用户！！！",
+          type: "error"
+        });
+        return false;
+      }
+      confirm({
+        content: "确定删除选择的数据，确认后将无法恢复！！",
+        fn: UserDelete
+      });
+    };
+    const UserDelete = () => {
+      UserDel({ id: data.tablerow.idItem })
+        .then(response => {
+          message({
+            message: response.data.message,
+            type: "success"
+          });
+          // 第一种触发子组件里面函数的方法
+          // refs.userTable.refreshData();
+          // 第二种触发子组件里面函数的方法
+          userTable.value.refreshData();
+        })
+        .catch(error => {});
+    };
+
     return {
+      userTable,
       data,
-      operation
+      operation,
+      handelBatchDel,
+      handlerDel
     };
   }
 };
