@@ -4,7 +4,7 @@
       :data="data.tableData"
       border
       style="width: 100%"
-      @selection-change="handleSelectionChange"
+      @selection-change="thatSlectCheckbox"
     >
       <!-- 多选框 -->
       <el-table-column
@@ -37,18 +37,28 @@
         </el-table-column>
       </template>
     </el-table>
-    <el-pagination
-      v-if="data.tableConfig.paginationShow"
-      @size-change="handleSizeChange"
-      @current-change="handleCurrentChange"
-      :current-page="pageData.currentPage"
-      :page-sizes="pageData.pageSizes"
-      :page-size="pageData.pageSize"
-      :layout="data.tableConfig.paginationLayout"
-      :total="pageData.total"
-      background
-    >
-    </el-pagination>
+    <div class="table-footer">
+      <el-row>
+        <el-col :span="4">
+          <slot name="tobleFooterLeft"></slot>
+        </el-col>
+        <el-col :span="20">
+          <el-pagination
+            class="pull-right"
+            v-if="data.tableConfig.paginationShow"
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pageData.currentPage"
+            :page-sizes="pageData.pageSizes"
+            :page-size="pageData.pageSize"
+            :layout="data.tableConfig.paginationLayout"
+            :total="pageData.total"
+            background
+          >
+          </el-pagination>
+        </el-col>
+      </el-row>
+    </div>
   </div>
 </template>
 <script>
@@ -67,9 +77,13 @@ export default {
     config: {
       type: Object,
       default: () => {}
+    },
+    tableRow: {
+      type: Object,
+      default: () => {}
     }
   },
-  setup(props, { root }) {
+  setup(props, { root, emit }) {
     const { tableData, tableLoadData } = loadData();
     const {
       pageData,
@@ -88,8 +102,13 @@ export default {
       },
       tableData: []
     });
-    let handleSelectionChange = () => {};
-
+    const thatSlectCheckbox = val => {
+      let rowData = {
+        idItem: val.map(item => item.id)
+      };
+      emit("update:tableRow", rowData);
+    };
+    // 初始化table配置项，匹配相同的key，如果存在则替换
     let initTableConfig = () => {
       let configData = props.config;
       let keys = Object.keys(data.tableConfig);
@@ -98,6 +117,9 @@ export default {
           data.tableConfig[key] = configData[key];
         }
       }
+    };
+    const refreshData = () => {
+      tableLoadData(data.tableConfig.requestData);
     };
     /*  watch(
       () => tableData.item,
@@ -116,10 +138,8 @@ export default {
       ([currentPage, pageSize]) => {
         let requestData = data.tableConfig.requestData;
         if (requestData.data) {
-          console.log(requestData);
           requestData.data.pageNumber = currentPage;
           requestData.data.pageSize = pageSize;
-
           tableLoadData(data.tableConfig.requestData);
         }
       }
@@ -130,12 +150,18 @@ export default {
     });
     return {
       data,
-      handleSelectionChange,
+      thatSlectCheckbox,
       pageData,
       handleSizeChange,
       handleCurrentChange,
-      totalCount
+      totalCount,
+      refreshData
     };
   }
 };
 </script>
+<style lang="scss" scoped>
+.table-footer {
+  padding: 15px 0;
+}
+</style>
