@@ -10,55 +10,65 @@
       <el-form-item
         label="用户名："
         :label-width="data.formLabelWidth"
-        prop="category"
+        prop="username"
       >
         <el-input
-          v-model="data.form.title"
+          v-model="data.form.username"
           placeholder="请输入用户名"
+        ></el-input>
+      </el-form-item>
+      <el-form-item
+        label="密码："
+        :label-width="data.formLabelWidth"
+        prop="password"
+      >
+        <el-input
+          v-model="data.form.password"
+          type="password"
+          placeholder="请输入6~20位数字+字母"
         ></el-input>
       </el-form-item>
       <el-form-item
         label="姓名："
         :label-width="data.formLabelWidth"
-        prop="title"
+        prop="truename"
       >
-        <el-input v-model="data.form.title" placeholder="请输入姓名"></el-input>
+        <el-input
+          v-model="data.form.truename"
+          placeholder="请输入姓名"
+        ></el-input>
       </el-form-item>
       <el-form-item
         label="手机号："
         :label-width="data.formLabelWidth"
-        prop="content"
+        prop="phone"
       >
         <el-input
-          v-model="data.form.title"
+          v-model.number="data.form.phone"
           placeholder="请输入手机号"
         ></el-input>
       </el-form-item>
       <el-form-item
         label="地区："
         :label-width="data.formLabelWidth"
-        prop="content"
+        prop="region"
       >
-        <!--  <CityPickerVue
-          :cityPickerLevel="['province', 'city', 'area']"
-          :cityPickerData.sync="data.cityPickerData"
-        /> -->
         <CityPickerVue :cityPickerData.sync="data.cityPickerData" />
       </el-form-item>
       <el-form-item
         label="是否启用："
         :label-width="data.formLabelWidth"
-        prop="content"
+        prop="status"
       >
-        <el-radio v-model="data.roleStatus" label="1">禁用</el-radio>
-        <el-radio v-model="data.roleStatus" label="2">启用</el-radio>
+        <el-radio v-model="data.form.status" label="1">禁用</el-radio>
+        <el-radio v-model="data.form.status" label="2">启用</el-radio>
       </el-form-item>
       <el-form-item
         label="角色："
         :label-width="data.formLabelWidth"
-        prop="content"
+        prop="role"
       >
-        <el-checkbox-group v-model="data.roleCode">
+        <el-checkbox-group v-model="data.form.role">
           <el-checkbox
             v-for="item in data.roleItem"
             :label="item.role"
@@ -77,6 +87,9 @@
   </el-dialog>
 </template>
 <script>
+import sha1 from "js-sha1";
+// 中央事件
+import Bus from "@/utils/bus";
 import {
   reactive,
   ref,
@@ -85,8 +98,7 @@ import {
   onBeforeMount
 } from "@vue/composition-api";
 import CityPickerVue from "@/components/CityPicker";
-import { AddInfo } from "@/api/news";
-import { GetRole } from "@/api/user";
+import { GetRole, UserAdd } from "@/api/user";
 import { global } from "@/utils/global_V3.0.js";
 export default {
   name: "dialogInfo",
@@ -94,10 +106,6 @@ export default {
     flag: {
       type: Boolean,
       default: false
-    },
-    category: {
-      type: Array,
-      default: () => []
     }
   },
   components: { CityPickerVue },
@@ -108,21 +116,22 @@ export default {
       submitLoading: false, //按钮加载
       form: {
         //表单数据
-        category: "",
-        title: "",
-        content: ""
+        username: "",
+        password: "",
+        truename: "",
+        phone: "",
+        region: "",
+        status: "1",
+        role: []
       },
-      categoryOption: [], //下拉分类
+
       // 城市数据
       cityPickerData: {},
-      // 是否启用状态
-      roleStatus: "1",
-      // 角色
-      roleCode: ["A"],
       // 角色选择
       roleItem: []
     });
     const { message } = global();
+    // 窗口关闭时
     const close = () => {
       data.dialog_info_flag = false;
       resetForm();
@@ -131,57 +140,52 @@ export default {
     // 窗口打开，动画结束时
     const openDialog = () => {
       getRole();
-      data.categoryOption = props.category;
     };
     // 添加信息
     const submit = () => {
-      let requestData = {
-        category: data.form.category,
-        title: data.form.title,
-        content: data.form.content
-      };
-      if (!data.form.category) {
+      if (!data.form.username) {
         message({
           type: "error",
-          message: "分类不能为空！！"
-        });
-        return false;
-      } else if (!data.form.title) {
-        message({
-          type: "error",
-          message: "标题不能为空！！"
-        });
-        return false;
-      } else if (!data.form.content) {
-        message({
-          type: "error",
-          message: "内容不能为空！！"
+          message: "用户名不能为空！！"
         });
         return false;
       }
+      if (!data.form.password) {
+        message({
+          type: "error",
+          message: "密码不能为空！！"
+        });
+        return false;
+      }
+      if (!data.form.role.length === 0) {
+        message({
+          type: "error",
+          message: "请选择角色类型！！"
+        });
+        return false;
+      }
+      // 简单深拷贝 JSON.parse(JSON.stringify(data.form))
+      // 浅拷贝
+      let requestData = Object.assign({}, data.form);
+      requestData.role = requestData.role.join();
+      requestData.password = sha1(requestData.password);
+      requestData.region = JSON.stringify(data.cityPickerData);
       submitLoadingFn(true);
-      AddInfo(requestData)
+      UserAdd(requestData)
         .then(response => {
-          let requestData = response.data;
           message({
             type: "success",
-            message: requestData.message
+            message: response.data.message
           });
-          submitLoadingFn(false);
-          emit("getListEmit");
           resetForm();
-        })
-        .catch(error => {
-          console.log(error);
           submitLoadingFn(false);
-        });
+        })
+        .catch(error => {});
     };
     //清空表单
     const resetForm = () => {
+      data.cityPickerData = {};
       refs.addInfoForm.resetFields();
-      /*  data.form.category = "";
-      data.form.title = "";
-      data.form.content = ""; */
     };
     // 禁用按钮
     const submitLoadingFn = flag => {
