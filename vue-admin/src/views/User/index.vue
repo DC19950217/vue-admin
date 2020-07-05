@@ -7,13 +7,19 @@
           <div class="warp-content">
             <el-row :gutter="16">
               <el-col :span="3">
-                <SelectVue :config="data.configOption" />
+                <SelectVue
+                  :config="data.configOption"
+                  :selectData.sync="data.selectData"
+                />
               </el-col>
               <el-col :span="5">
-                <el-input placeholder="请输入搜索的关键字"></el-input>
+                <el-input
+                  v-model="data.key_word"
+                  placeholder="请输入搜索的关键字"
+                ></el-input>
               </el-col>
               <el-col :span="15">
-                <el-button type="danger">搜索</el-button>
+                <el-button type="danger" @click="search">搜索</el-button>
               </el-col>
             </el-row>
           </div>
@@ -36,6 +42,7 @@
     >
       <template v-slot:status="slotData">
         <el-switch
+          @change="handlerSwitch(slotData.data)"
           v-model="slotData.data.status"
           active-color="#13ce66"
           inactive-color="#ff4949"
@@ -48,7 +55,10 @@
         <el-button type="danger" size="small" @click="handlerDel(slotData.data)"
           >删除</el-button
         >
-        <el-button type="success" size="small" @click="operation(slotData.data)"
+        <el-button
+          type="success"
+          size="small"
+          @click="handlerEdit(slotData.data)"
           >编辑</el-button
         >
       </template>
@@ -56,7 +66,11 @@
         <el-button size="small" @click="handelBatchDel">批量删除</el-button>
       </template>
     </TableVue>
-    <DialogAdd :flag.sync="data.dialog_add" />
+    <DialogAdd
+      :flag.sync="data.dialog_add"
+      :editData="data.editData"
+      @refreshTableData="refreshData"
+    />
   </div>
 </template>
 <script>
@@ -70,7 +84,7 @@ import DialogAdd from "./dialog/add";
 // 中央事件
 import Bus from "@/utils/bus";
 
-import { UserDel } from "@/api/user";
+import { UserDel, UserActives } from "@/api/user";
 export default {
   name: "userIndex",
   components: { SelectVue, TableVue, DialogAdd },
@@ -80,10 +94,15 @@ export default {
     const data = reactive({
       // table选择的数据
       tablerow: {},
+      // 下来菜单的数据
+      selectData: {},
+      // 搜索关键字
+      key_word: "",
       dialog_add: false,
       configOption: {
         init: ["name", "phone", "email"]
       },
+      updateUserStatusFlag: false,
       configTable: {
         selection: true,
         tHead: [
@@ -114,6 +133,7 @@ export default {
             pageSize: 10
           }
         },
+        editData: {},
         paginationLayout: "total, sizes, prev, pager, next, jumper",
         paginationShow: true
       }
@@ -143,6 +163,7 @@ export default {
         fn: UserDelete
       });
     };
+    // 删除用户封装方法
     const UserDelete = () => {
       UserDel({ id: data.tablerow.idItem })
         .then(response => {
@@ -153,9 +174,51 @@ export default {
           // 第一种触发子组件里面函数的方法
           // refs.userTable.refreshData();
           // 第二种触发子组件里面函数的方法
-          userTable.value.refreshData();
+          refreshData();
         })
         .catch(error => {});
+    };
+    // 刷新用户列表
+    const refreshData = () => {
+      userTable.value.refreshData();
+    };
+    // 禁启用按钮状态
+    const UserStatusFlagFn = flag => {
+      data.updateUserStatusFlag = flag;
+    };
+    // 禁启用按钮
+    const handlerSwitch = params => {
+      if (data.updateUserStatusFlag) {
+        return false;
+      }
+      UserStatusFlagFn(true);
+      let requestData = {
+        id: params.id,
+        status: params.status
+      };
+      UserActives(requestData)
+        .then(response => {
+          message({
+            message: response.data.message,
+            type: "success"
+          });
+          UserStatusFlagFn(false);
+        })
+        .catch(error => {
+          UserStatusFlagFn(false);
+        });
+    };
+    // 编辑用户数据
+    const handlerEdit = params => {
+      data.dialog_add = true;
+      data.editData = Object.assign({}, params);
+    };
+    // 搜索
+    const search = () => {
+      let requestData = {
+        [data.selectData.value]: data.key_word
+      };
+      refs.userTable.paramsLoadData(requestData);
     };
 
     return {
@@ -163,7 +226,11 @@ export default {
       data,
       operation,
       handelBatchDel,
-      handlerDel
+      handlerDel,
+      refreshData,
+      handlerSwitch,
+      handlerEdit,
+      search
     };
   }
 };
