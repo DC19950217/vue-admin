@@ -23,3 +23,21 @@ export function UserDel(data) {
     data: data
   })
 }
+
+// 用户禁启用
+export function UserActives(data) {
+  return serveice.request({
+    method: "post",
+    url: "/user/actives/",
+    data: data
+  })
+}
+
+// 用户编辑
+export function UserEdit(data) {
+  return serveice.request({
+    method: "post",
+    url: "/user/edit/",
+    data: data
+  })
+}
