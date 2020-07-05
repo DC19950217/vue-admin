@@ -1,5 +1,5 @@
 <template>
-  <el-select v-model="data.selectValue" placeholder="请选择">
+  <el-select v-model="data.selectValue" placeholder="请选择" @change="select">
     <el-option
       v-for="item in data.initOption"
       :key="item.value"
@@ -17,9 +17,13 @@ export default {
     config: {
       type: Object,
       default: () => {}
+    },
+    selectData: {
+      type: Object,
+      default: () => {}
     }
   },
-  setup(props, { root }) {
+  setup(props, { root, emit }) {
     const data = reactive({
       selectValue: "",
       initOption: [],
@@ -32,7 +36,7 @@ export default {
       ]
     });
     // 初始化下拉选择
-    let initOption = () => {
+    const initOption = () => {
       let initData = props.config.init;
       let optionArr = [];
       if (initData.length === 0) {
@@ -52,11 +56,17 @@ export default {
       // 初始化默认赋值
       data.selectValue = optionArr[0].value;
     };
+    // 选择触发
+    const select = val => {
+      let filterData = data.option.filter(item => item.value == val)[0];
+      emit("update:selectData", filterData);
+    };
     onMounted(() => {
       initOption();
     });
     return {
-      data
+      data,
+      select
     };
   }
 };
