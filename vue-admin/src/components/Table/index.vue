@@ -13,7 +13,7 @@
         width="55"
       >
       </el-table-column>
-
+      <!-- 表头字段渲染 -->
       <template v-for="item in data.tableConfig.tHead">
         <el-table-column
           :key="item.field"
@@ -118,8 +118,18 @@ export default {
         }
       }
     };
+    // 刷新数据
     const refreshData = () => {
       tableLoadData(data.tableConfig.requestData);
+    };
+    // 带参数刷新数据
+    const paramsLoadData = params => {
+      let requestData = Object.assign({}, params, {
+        pageNumber: 1,
+        pageSize: 10
+      });
+      data.tableConfig.requestData.data = requestData;
+      tableLoadData(data.tableConfig.requestData)
     };
     /*  watch(
       () => tableData.item,
@@ -155,7 +165,8 @@ export default {
       handleSizeChange,
       handleCurrentChange,
       totalCount,
-      refreshData
+      refreshData,
+      paramsLoadData
     };
   }
 };
