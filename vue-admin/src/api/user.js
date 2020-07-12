@@ -7,6 +7,15 @@ export function GetRole(data = {}) {
     data: data
   })
 }
+// 系统列表
+export function GetSystem(data) {
+  return serveice.request({
+    method: "post",
+    url: "/system/",
+    data: data
+  })
+}
+
 // 添加用户
 export function UserAdd(data = {}) {
   return serveice.request({
