@@ -64,7 +64,7 @@
         <el-radio v-model="data.form.status" label="2">启用</el-radio>
       </el-form-item>
       <el-form-item
-        label="角色："
+        label="系统："
         :label-width="data.formLabelWidth"
         prop="role"
       >
@@ -101,7 +101,7 @@ import {
   onBeforeMount
 } from "@vue/composition-api";
 import CityPickerVue from "@/components/CityPicker";
-import { GetRole, UserAdd, UserEdit } from "@/api/user";
+import { GetRole, GetSystem, UserAdd, UserEdit } from "@/api/user";
 import { global } from "@/utils/global_V3.0.js";
 import { stripscript, validateEmail, validatePass } from "@/utils/validate";
 export default {
