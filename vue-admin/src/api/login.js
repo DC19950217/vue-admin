@@ -12,7 +12,13 @@ export function GetSms(data) {
 /**
  * 获取用户角色
  */
-
+export function GetUserRole(data = {}) {
+    return server.request({
+        method: "post",
+        url: "/userRole/",
+        data: data
+    })
+}
 /**
  * 登录
  */
