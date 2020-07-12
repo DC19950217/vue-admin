@@ -11,11 +11,13 @@ import {
 } from "@/utils/app"
 const state = {
     isCollapse: JSON.parse(sessionStorage.getItem('isCollapse')) || false,
-    to_ken: getToken()||'',
-    username: getUserName()||''
+    to_ken: getToken() || '',
+    username: getUserName() || '',
+    roles: []
 }
 const getters = {
-    isCollapse: (state)=>{state.isCollapse},
+    isCollapse: state => state.isCollapse,
+    roles: state => state.roles
 }
 const mutations = {
     // 处理nav菜单的收起展开
@@ -30,6 +32,9 @@ const mutations = {
     },
     SET_USERNAME(state, value) {
         state.username = value;
+    },
+    SET_ROLES(state, value) {
+        state.roles = value
     }
 }
 const actions = {
@@ -44,11 +49,14 @@ const actions = {
         return resdata.data;
 
     },
-    async exit({commit}){
+    async exit({
+        commit
+    }) {
         removeToken();
         removeUserName();
-        commit("SET_TOKEN","");
-        commit("SET_USERNAME","");
+        commit("SET_TOKEN", "");
+        commit("SET_USERNAME", "");
+        commit("SET_ROLES", []);
         return "退出成功";
     }
 }
