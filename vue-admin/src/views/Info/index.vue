@@ -70,6 +70,7 @@
           size="medium"
           @click="dialog_info = true"
           style="width:100%;"
+          v-if="btnPerm('info:add')"
           >新增</el-button
         >
       </el-col>
@@ -104,13 +105,26 @@
             type="danger"
             size="mini"
             @click="deleteItem(scope.row.id)"
+            v-btnPerm="'info:del'"
+            class="hiden-button"
           >
             删除
           </el-button>
-          <el-button type="success" size="mini" @click="editInfo(scope.row.id)"
+          <el-button
+            type="success"
+            size="mini"
+            @click="editInfo(scope.row.id)"
+            v-btnPerm="'info:edit'"
+            class="hiden-button"
             >编辑</el-button
           >
-          <el-button type="success" size="mini" @click="detailed(scope.row)">
+          <el-button
+            type="success"
+            size="mini"
+            @click="detailed(scope.row)"
+            v-btnPerm="'info:detailed'"
+            class="hiden-button"
+          >
             编辑详情
           </el-button>
         </template>
@@ -219,7 +233,7 @@ export default {
       getList();
     };
     // 下一页数据
-    const handleCurrentChange = (val) => {
+    const handleCurrentChange = val => {
       page.pageNumber = val;
       getList();
     };
@@ -420,4 +434,6 @@ export default {
     @include labelDom(right, 60, 40);
   }
 }
+</style>
+<style>
 </style>
