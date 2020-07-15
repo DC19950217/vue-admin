@@ -22,3 +22,10 @@
     margin-left: (1px * $i);
   }
 }
+
+button.hiden-button {
+  display: none;
+}
+button.show-button {
+  display: inline-block;
+}
