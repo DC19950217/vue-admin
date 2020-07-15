@@ -28,8 +28,9 @@
       <el-col :span="4"
         ><el-button
           type="danger"
-          class="pull-right"
+          class="pull-right hiden-button"
           @click="data.dialog_add = true"
+          v-btnPerm="'user:add'"
           >添加用户</el-button
         ></el-col
       >
@@ -52,18 +53,31 @@
         </el-switch>
       </template>
       <template v-slot:operation="slotData">
-        <el-button type="danger" size="small" @click="handlerDel(slotData.data)"
+        <el-button
+          type="danger"
+          size="small"
+          @click="handlerDel(slotData.data)"
+          v-btnPerm="'user:del'"
+          class="hiden-button"
           >删除</el-button
         >
         <el-button
           type="success"
           size="small"
           @click="handlerEdit(slotData.data)"
+          v-btnPerm="'user:edit'"
+          class="hiden-button"
           >编辑</el-button
         >
       </template>
       <template v-slot:tobleFooterLeft>
-        <el-button size="small" @click="handelBatchDel">批量删除</el-button>
+        <el-button
+          size="small"
+          @click="handelBatchDel"
+          v-btnPerm="'user:batchDel'"
+          class="hiden-button"
+          >批量删除</el-button
+        >
       </template>
     </TableVue>
     <DialogAdd
