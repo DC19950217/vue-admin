@@ -1,4 +1,12 @@
 import serveice from '@/utils/request';
+// 获取按钮列表
+export function GetPermButton(data) {
+  return serveice.request({
+    method: "post",
+    url: "/permButton/",
+    data: data
+  });
+}
 // 获取用户列表
 export function GetRole(data = {}) {
   return serveice.request({
