@@ -77,6 +77,24 @@
           </el-checkbox>
         </el-checkbox-group>
       </el-form-item>
+      <el-form-item label="按钮：" :label-width="data.formLabelWidth">
+        <template v-if="data.btnPerm.length > 0">
+          <!-- eslint-disable-next-line  -->
+          <div v-for="item in data.btnPerm">
+            <h4>{{ item.name }}</h4>
+            <template v-if="item.perm && item.perm.length > 0">
+              <el-checkbox-group v-model="data.form.btnPerm">
+                <el-checkbox
+                  v-for="buttons in item.perm"
+                  :key="buttons.value"
+                  :label="buttons.value"
+                  >{{ buttons.name }}</el-checkbox
+                >
+              </el-checkbox-group>
+            </template>
+          </div>
+        </template>
+      </el-form-item>
     </el-form>
     <div slot="footer" class="dialog-footer">
       <el-button @click="close">取消</el-button>
@@ -101,7 +119,13 @@ import {
   onBeforeMount
 } from "@vue/composition-api";
 import CityPickerVue from "@/components/CityPicker";
-import { GetRole, GetSystem, UserAdd, UserEdit } from "@/api/user";
+import {
+  GetPermButton,
+  GetRole,
+  GetSystem,
+  UserAdd,
+  UserEdit
+} from "@/api/user";
 import { global } from "@/utils/global_V3.0.js";
 import { stripscript, validateEmail, validatePass } from "@/utils/validate";
 export default {
@@ -162,7 +186,8 @@ export default {
         phone: "15218298951",
         region: "",
         status: "1",
-        role: []
+        role: [],
+        btnPerm: []
       },
       rules: {
         username: [{ validator: validateUsername, trigger: "blur" }],
@@ -173,7 +198,9 @@ export default {
       // 城市数据
       cityPickerData: {},
       // 角色选择
-      roleItem: []
+      roleItem: [],
+      // 按钮
+      btnPerm: []
     });
     const { message } = global();
     // 窗口关闭时
@@ -189,12 +216,13 @@ export default {
       // 初始值处理
       let editData = props.editData;
       if (editData && editData.id) {
-        editData.role = editData.role.split(",");
+        editData.role = editData.role ? editData.role.split(",") : [];
+        editData.btnPerm = editData.btnPerm ? editData.btnPerm.split(",") : [];
+        for (let key in editData) {
+          data.form[key] = editData.id ? editData[key] : "";
+        }
       } else {
         data.form.id && delete data.form.id;
-      }
-      for (let key in editData) {
-        data.form[key] = editData.id ? editData[key] : "";
       }
     };
     // 添加信息
@@ -205,7 +233,7 @@ export default {
           // 浅拷贝
           let requestData = Object.assign({}, data.form);
           requestData.role = requestData.role.join();
-
+          requestData.btnPerm = requestData.btnPerm.join();
           requestData.region = JSON.stringify(data.cityPickerData);
           submitLoadingFn(true);
 
@@ -275,6 +303,11 @@ export default {
         .then(response => {
           let result = response.data.data;
           data.roleItem = result;
+        })
+        .catch(err => {});
+      GetPermButton()
+        .then(response => {
+          data.btnPerm = response.data.data;
         })
         .catch(err => {});
     };
