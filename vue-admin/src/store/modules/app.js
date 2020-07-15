@@ -13,11 +13,13 @@ const state = {
     isCollapse: JSON.parse(sessionStorage.getItem('isCollapse')) || false,
     to_ken: getToken() || '',
     username: getUserName() || '',
-    roles: []
+    roles: [],
+    buttonPremission: []
 }
 const getters = {
     isCollapse: state => state.isCollapse,
-    roles: state => state.roles
+    roles: state => state.roles,
+    buttonPremission: state => state.buttonPremission
 }
 const mutations = {
     // 处理nav菜单的收起展开
@@ -35,6 +37,9 @@ const mutations = {
     },
     SET_ROLES(state, value) {
         state.roles = value
+    },
+    SET_BUTTON(state, value) {
+        state.buttonPremission = value
     }
 }
 const actions = {
