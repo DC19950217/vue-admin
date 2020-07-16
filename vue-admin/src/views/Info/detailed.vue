@@ -46,7 +46,13 @@
   </el-form>
 </template>
 <script>
-import { reactive, ref, watch, onMounted } from "@vue/composition-api";
+import {
+  reactive,
+  ref,
+  watch,
+  onMounted,
+  onActivated
+} from "@vue/composition-api";
 import { GetList, EditInfo } from "@/api/news";
 import { timestampToTime } from "@/utils/common";
 // 富文本
@@ -146,6 +152,10 @@ export default {
     };
     onMounted(() => {
       getInfoCategory();
+    });
+    onActivated(() => {
+      data.id =
+        root.$route.params.id || root.$store.getters["infoDetailed/infoId"];
       getInfo();
     });
     return {
