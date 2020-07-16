@@ -299,17 +299,25 @@ export default {
     };
     // 请求角色
     const getRole = () => {
-      GetRole()
-        .then(response => {
-          let result = response.data.data;
-          data.roleItem = result;
-        })
-        .catch(err => {});
-      GetPermButton()
-        .then(response => {
-          data.btnPerm = response.data.data;
-        })
-        .catch(err => {});
+      // 优化请求
+     /*  if (data.roleItem.length > 0 && data.btnPerm.length > 0) {
+        return false;
+      } */
+      if (data.roleItem.length === 0) {
+        GetRole()
+          .then(response => {
+            let result = response.data.data;
+            data.roleItem = result;
+          })
+          .catch(err => {});
+      }
+      if (data.btnPerm.length === 0) {
+        GetPermButton()
+          .then(response => {
+            data.btnPerm = response.data.data;
+          })
+          .catch(err => {});
+      }
     };
     watch(() => {
       data.dialog_info_flag = props.flag;
